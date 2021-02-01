@@ -2,6 +2,7 @@
 title: "Introduction to DATA607 CUNY SPS"
 author: ""
 output:
+  pdf_document: default
   html_document:
     includes:
       in_header: header.html
@@ -10,7 +11,6 @@ output:
     theme: cerulean
     toc: true
     toc_float: true
-  pdf_document: default
 editor_options: 
   chunk_output_type: console
 params:
