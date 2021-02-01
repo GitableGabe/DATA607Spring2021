@@ -24,6 +24,8 @@ library(openintro)
 library(viridis)
 library(marmap)
 library(knitr)
+library(reticulate)
+use_python("/Users/gcamp/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Python 3.8")
 ```
 
 ```{r r-interface-2020, echo=FALSE, results="asis", out.width = "85%"}
