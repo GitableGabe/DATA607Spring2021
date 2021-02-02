@@ -319,7 +319,6 @@ See the [Introduction].
 * Block quotes
 * Latex Equations
 * Horizontal rules
-* Tables
 * Footnotes
 * Bibliographies and Citations
 * Slide breaks

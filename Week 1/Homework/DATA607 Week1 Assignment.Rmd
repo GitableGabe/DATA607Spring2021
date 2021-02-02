@@ -1,0 +1,168 @@
+---
+title: "DATA607 Week 1 Assignment - Loading Data into a Data Frame"
+author: "Gabriel Campos"
+date: "2/2/2021"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=FALSE,warning=FALSE}
+library(kableExtra)
+```
+
+
+Assignment Requirements
+=======================
+DATA607 Week 1 assignment: choose one of the provided datasets on [fivethirtyeight.com](https://data.fivethirtyeight.com/) that you find interesting:
+
+1. Take the data, and create one or more code blocks.
+    + You should finish with a data frame that contains a subset of the columns in your selected dataset.
+    If there is an obvious target (aka predictor or independent)variable, you should include this in your
+    set of columns.
+    + You should include (or add if necessary) meaningful column names and replace (if necessary) any 
+    non-intuitive abbreviations used in the data that you selected. **For example:** *if you had instead*
+    *been tasked with working with the UCI mushroom dataset, you would include the target column for edible*
+    *or poisonous, and transform “e” values to “edible.”* 
+    + Your deliverable is the R code to perform these transformation tasks.
+2. Make sure that the original data file is accessible through your code—for example, stored in a GitHub
+repository or AWS S3 bucket and referenced in your code. **If the code references data on your local**
+**machine, then your work is not reproducible!**
+3. Start your R Markdown document with a two to three sentence **“Overview”** or *“Introduction”* description of
+what the article that you chose is about, and include a link to the article.
+4. Finish with a **“Conclusions”** or **“Findings and Recommendations”** text block that includes what you might do
+to **extend**, **verify**, or **update** the work from the selected article.
+5. Each of your text blocks should minimally include **at least one header**, and **additional non-header text**.
+6. You’re of course welcome—**but not required**--to include additional information, such as **exploratory data**
+**analysis graphics** (which we will cover later in the course).
+7. Place your solution into a **single R Markdown (.Rmd) file** and **publish your solution out to rpubs.com.**
+8. Post the **.Rmd file in your GitHub repository**, and provide the appropriate **URLs** to your **GitHub repository and your rpubs.com file in your assignment link.**
+
+Overview
+========
+
+[FiveThirtyEight's Club Soccer Prediction site]("https://projects.fivethirtyeight.com/soccer-predictions/")
+was designed to forecast Futbol match wins. The data is broken down into several variables including a Soccer
+Power Index, which is an overall measure of a teams strength, as well as the Home or Visiting team's odds of
+winning and their probable score. 
+
+Data Dictionary
+---------------
+The following lists the variables related to the Dataset, as provided by [the creators github]("https://github.com/fivethirtyeight/data/tree/master/soccer-spi"):
+    
+
+```{r, echo=FALSE}
+d_dict_desc <- c("Season Year","Date of Match","Unique Id # for League","League Name","Home Team","Visiting Team","FiveThirtyEight's Soccer Power Index (Overall Strength) for Home Team","FiveThirtyEight's Soccer Power Index (Overall Strength) for Visiting Team", "Probability Home Team Wins", "Probability Visiting Team Wins","Probability of a Tie","Projected points scored by Home Team","Projected Points scored by Visiting Team","A measure of how much the outcome of the match will change Home team’s statistical outlook on the season","A measure of how much the outcome of the match will change Visiting team’s statistical outlook on the season","Actual points scored by Home Team","Actual points scored by Visiting Team",'An estimate of how many goals Home Team “should” have scored, given the shots they took in that match','An estimate of how many goals Visiting Team "should" have scored, given the shots they took in that match','an estimate of how many goals Home team “should” have scored based on non-shooting actions they took around the opposing team’s goal5: passes, interceptions, take-ons and tackles','an estimate of how many goals Visiting team “should” have scored based on non-shooting actions they took around the opposing team’s goal5: passes, interceptions, take-ons and tackles'," accounts for the conditions under which Home goal was scored: we reduce the value of goals scored when a team has more players on the field, as well as goals scored late in a match when a team is already leading."," accounts for the conditions under which Visitor goal was scored: we reduce the value of goals scored when a team has more players on the field, as well as goals scored late in a match when a team is already leading.")
+
+my.attribute <- read.csv("https://projects.fivethirtyeight.com/soccer-api/club/spi_matches.csv", header = FALSE, nrows = 1, as.is = TRUE)
+
+dict_table             <- as.data.frame(t(my.attribute))
+colnames(dict_table)   <- c("Attributes")
+dict_table$Description <- d_dict_desc
+rownames(dict_table)   <-NULL
+
+```
+
+```{r, echo=FALSE}
+dict_table %>%
+  kbl() %>%
+  kable_styling()
+```
+
+
+
+Load Data
+=========
+
+Data Set Title: spi_matches
+---------------------------
+
+### Source Information:
+
+(a) Creators: Jay Boice
+(b) Github: [jayb]("https://github.com/jayb")
+(c) Most recent update: 6/2/2020
+
+```{r}
+spi_matches<-read.csv("https://projects.fivethirtyeight.com/soccer-api/club/spi_matches.csv", header= TRUE, sep=",")
+```
+
+```{r, echo=FALSE}
+head(spi_matches)
+```
+
+Subsetting the Data Set
+=======================
+
+## What was the biggest Home Team upset over the past 4 years?
+
+
+### Initial subset
+
+In order to decide what match(es) can be considered the greatest upset, I chose to make use of the Home Teams SPI and probability of winning vs. the actual final score. My subset will include games where the Home team's Soccer Power Index and Probability of winning is less than that of their opponent. Additionally, my subset will only include games where the final score has the Home team winning despite the latter statistics.
+
+```{r, echo = TRUE}
+#Identifying Match upsets
+upset <-subset(spi_matches, (spi_matches$spi1)<spi_matches$spi2 & spi_matches$prob1<spi_matches$prob2 & spi_matches$score1>spi_matches$score2, select = c(season, team1, team2,spi1,spi2, score1, score2, prob1))
+#Concatenating spi and score
+upset$score1 <-paste(upset$score1,"-",upset$score2)
+#Removing unneeded column
+upset$score2 <- NULL
+
+head(upset,3)
+```
+
+### Calculations and Renaming
+
+The data `upset` accounts for matches where Home Teams having a lower SPI. I am interested in seeing the difference in SPI per match for a clearer assessment. Scores will be concatenated since it is not used for any calculations. Columns will be renamed for better understanding.
+
+```{r}
+
+upset$spi3<- abs(upset$spi1 - upset$spi2)
+#Removing unneeded column
+upset$spi1 <- NULL
+upset$spi2 <- NULL
+colnames(upset)<-c ("Season","Home Team","Visiting Team","Score","Odds","SPI Difference")
+head(upset,4)
+```
+
+
+```{r, echo = FALSE}
+paste0("The average Odds for games with upsets is: ",mean(upset$Odds)," with a standard deviation of ", sd(upset$Odds))
+
+paste0("The average difference in SPI for games with upsets is: ",mean(upset$`SPI Difference`)," with a standard deviation of ", sd(upset$`SPI Difference`))
+```
+
+In my perspective, the biggest Home Team upsets in the past 4 years will include matches where:
+
+a. The Home Teams probability of winning is at least one standard deviation lower than the average among our upsets.
+b. The difference in SPI between the teams must be at least 1 standard deviation HIGHER than the mean.
+
+**NOTE:** *The subset is already sorted to only reflect matches where the Home team is at a disadvantage*
+*both in probability of winning and SPI*
+
+```{r}
+biggest_upsets <- subset(upset,upset$Odds<(mean(upset$Odds)-sd(upset$Odds)) & 
+                             upset$`SPI Difference`<(mean(upset$`SPI Difference`)+sd(upset$`SPI Difference`)))
+biggest_upsets <- biggest_upsets[with(biggest_upsets, order(biggest_upsets$Odds)), ]
+```
+
+Conclusions
+===========
+
+I believe ten matches below reflect the biggest upsets in futbol over the last 4 years. I will acknowledge, my final data set `biggest_upsets` included 161 observations and my top 10 ten is based on my decision to sort by probability of winning, as I believe it carries more weight than SPI.
+
+```{r, echo=FALSE}
+head(biggest_upsets,10) %>%
+  kbl() %>%
+  kable_styling()
+```
