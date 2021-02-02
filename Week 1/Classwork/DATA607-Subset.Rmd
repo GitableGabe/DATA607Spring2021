@@ -1,0 +1,80 @@
+---
+title: "DATA607-Subsetting"
+author: "Gabriel Campos"
+date: "2/1/2021"
+output:
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = TRUE)
+```
+
+SUBSETTING
+==========
+
+## R 101: The Subset Function
+
+[R-bloggers R101 The Subset Function](https://www.r-bloggers.com/2011/11/r-101-the-subset-function/)
+
+
+```{r vectors}
+numvec  = c(2,5,8,9,0,6,7,8,4,5,7,11)
+charvec = c("David","James","Sara","Tim","Pierre","Janice","Sara","Priya","Keith","Mark","Apple","Sara")
+gender  = c ("M","M","F","M","M","M","F","F","F","M","M","F")
+state   = c("CO","KS","CA","IA","MO","FL","CA","CO","FL","CA","WY","AZ")
+```
+
+
+```{r subsets}
+subset(numvec,numvec > 7)
+subset(numvec, numvec < 9 & numvec > 4)
+subset(numvec, numvec < 3 |numvec > 9)
+```
+
+
+```{r subset-dataframe}
+df = data.frame(var1 = c(numvec), var2 = c(charvec), gender = c(gender), state = c(state))
+```
+
+```{r clearer-subset}
+subset(df, var1 < 5)
+subset(df, var2 == "Sara")
+subset(df, var1==5, select=c(var2, state))
+subset(df, var2 != "Sara" & gender == "F" & var1 > 5)
+```
+
+## Hands On Lab Subsetting Datasets
+
+**Loading .csv into dataframe:**
+
+```{r pressure, echo=FALSE}
+bridges       <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/bridges/bridges.data.version1", header = FALSE)
+bridges2      <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/bridges/bridges.data.version2", header = FALSE)
+bridges_names <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/bridges/bridges.names", header = FALSE)
+```
+
+**Adding column names:**
+
+```{r}
+colname <- c("IDENTIF", "RIVER", "LOCATION","ERECTED","PURPOSE","LENGTH","LANES","CLEAR-G","T-OR-D","MATERIAL","SPAN","REL-L","TYPE")
+colnames(bridges) <- colname
+colnames(bridges2) <-colname
+```
+
+**Create a subset:**
+
+```{r}
+subset(bridges, bridges$TYPE == "WOOD" & bridges$LENGTH > 1000 & bridges$LANES > 1)
+```
+
