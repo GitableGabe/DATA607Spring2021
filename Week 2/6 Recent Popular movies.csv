@@ -1,0 +1,37 @@
+SurveyID,Movie,Rating,Description
+1,The Little Things,5,Loved It
+1,The Croods: A New Age,2,Didn't hate it
+1,The Marksman,3,Neutral
+1,Wonders Woman 1984,4,Liked it
+1,Monster Hunter,5,Loved It
+1,News of The World,-1,Have not seen this movie
+2,The Little Things,-1,Have not seen this movie
+2,The Croods: A New Age,5,Loved It
+2,The Marksman,-1,Have not seen this movie
+2,Wonders Woman 1984,-1,Have not seen this movie
+2,Monster Hunter,1,Hated it
+2,News of The World,-1,Have not seen this movie
+3,The Little Things,1,Hated it
+3,The Croods: A New Age,1,Hated it
+3,The Marksman,1,Hated it
+3,Wonders Woman 1984,1,Hated it
+3,Monster Hunter,1,Hated it
+3,News of The World,1,Hated it
+4,The Little Things,5,Loved It
+4,The Croods: A New Age,4,Liked it
+4,The Marksman,3,Neutral
+4,Wonders Woman 1984,2,Didn't hate it
+4,Monster Hunter,1,Hated it
+4,News of The World,-1,Have not seen this movie
+5,The Little Things,3,Neutral
+5,The Croods: A New Age,3,Neutral
+5,The Marksman,3,Neutral
+5,Wonders Woman 1984,-1,Have not seen this movie
+5,Monster Hunter,2,Didn't hate it
+5,News of The World,3,Neutral
+6,The Little Things,5,Loved It
+6,The Croods: A New Age,1,Hated it
+6,The Marksman,-1,Have not seen this movie
+6,Wonders Woman 1984,-1,Have not seen this movie
+6,Monster Hunter,-1,Have not seen this movie
+6,News of The World,4,Liked it
