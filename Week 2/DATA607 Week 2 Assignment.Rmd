@@ -118,14 +118,15 @@ Data Set Title: 6 Recent Popular movies
 
 ### Connecting
 
-Connection is established using the Open Database Connectivity [(ODBC)](https://docs.microsoft.com/en-us/sql/odbc/reference/what-is-odbc) configured on my local machine to connect to MySQL with a user that has **[read privileges](https://www.techbeamers.com/mysql-grant-privileges/)** on my specified table.
+Connection is established using the Open Database Connectivity [(ODBC)](https://docs.microsoft.com/en-us/sql/odbc/reference/what-is-odbc) configured on my local machine to connect to MySQL with a user that has **[read privileges](https://www.techbeamers.com/mysql-grant-privileges/)** on my specified table. The `askForPassword` function prompts the user to specify the DSN via a GUI. In this way the DSN name and connection string are both masked, while the database directly is protected via the `Principle of Least Privilege`.
 
- ```{r}
-# con <- dbConnect(odbc(),"myconnection")
- ```
+```{r}
+DSN <- rstudioapi::askForPassword("DSN Name")
+```
 
-```{r,include=FALSE}
-con <- dbConnect(odbc(),"myconnection")
+
+```{r,include=TRUE}
+con <- dbConnect(odbc(),DSN)
 ```
 
 ```{r, echo = FALSE}

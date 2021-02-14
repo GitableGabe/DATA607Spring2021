@@ -1956,8 +1956,9 @@ Movie Name
 </div>
 <div id="connecting" class="section level3">
 <h3>Connecting</h3>
-<p>Connection is established using the Open Database Connectivity <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/what-is-odbc">(ODBC)</a> configured on my local machine to connect to MySQL with a user that has <strong><a href="https://www.techbeamers.com/mysql-grant-privileges/">read privileges</a></strong> on my specified table.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="kw">odbc</span>(),<span class="st">&quot;data607&quot;</span>)</span></code></pre></div>
+<p>Connection is established using the Open Database Connectivity <a href="https://docs.microsoft.com/en-us/sql/odbc/reference/what-is-odbc">(ODBC)</a> configured on my local machine to connect to MySQL with a user that has <strong><a href="https://www.techbeamers.com/mysql-grant-privileges/">read privileges</a></strong> on my specified table. The <code>askForPassword</code> function prompts the user to specify the DSN via a GUI. In this way the DSN name and connection string are both masked, while the database directly is protected via the <code>Principle of Least Privilege</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>DSN &lt;-<span class="st"> </span>rstudioapi<span class="op">::</span><span class="kw">askForPassword</span>(<span class="st">&quot;DSN Name&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(<span class="kw">odbc</span>(),DSN)</span></code></pre></div>
 <pre><code>## [1] &quot;Tables available on this db are &quot;</code></pre>
 <pre><code>## [1] &quot;moviename&quot;    &quot;movieratings&quot; &quot;tb&quot;</code></pre>
 </div>
@@ -1965,10 +1966,10 @@ Movie Name
 <h3>Importing the Data</h3>
 <p>Using the <strong><a href="https://www.rdocumentation.org/packages/DBI/versions/0.5-1/topics/dbGetQuery">dbGetQuery() function</a></strong> which is a part of the <strong><a href="https://db.rstudio.com/dbi/">DBI package</a></strong> I was able to run a SQL query directly and import the results onto a dataframe for further use. </p>
 <p><strong>NOTE:</strong> <em>Importing of NULL values in database, converts to NA in the dataframe.</em></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>movieRatingsQuery &lt;-<span class="st"> </span><span class="kw">dbGetQuery</span>(con,</span>
-<span id="cb4-2"><a href="#cb4-2"></a>                        <span class="st">&quot;SELECT surveyID,name AS movie, rating, details</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="st">                        FROM movieRatings</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="st">                        JOIN movieName ON movieRatings.movieID = movieName.movieID;&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>movieRatingsQuery &lt;-<span class="st"> </span><span class="kw">dbGetQuery</span>(con,</span>
+<span id="cb5-2"><a href="#cb5-2"></a>                        <span class="st">&quot;SELECT surveyID,name AS movie, rating, details</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="st">                        FROM movieRatings</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="st">                        JOIN movieName ON movieRatings.movieID = movieName.movieID;&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -1977,12 +1978,12 @@ Movie Name
 <div id="count" class="section level2">
 <h2>Count</h2>
 <p>A count of the amount of NULL values can be done directly from the database using an SQL query or the obtained by subsetting the loaded data frame as show below.  <strong>NOTE:</strong> <em>Once again, NULL values are converted to NA using the dataframe, but will display as NULL when using dbGetQuery with not importing</em></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">dbGetQuery</span>(con,</span>
-<span id="cb5-2"><a href="#cb5-2"></a>           <span class="st">&quot;SELECT surveyID,name AS movie, rating, details</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="st">                              FROM movieRatings</span></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="st">                              JOIN movieName ON movieRatings.movieID = movieName.movieID</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="st">                              WHERE rating IS NULL;&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">subset</span>(movieRatingsQuery,<span class="kw">is.na</span>(movieRatingsQuery<span class="op">$</span>rating))</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">dbGetQuery</span>(con,</span>
+<span id="cb6-2"><a href="#cb6-2"></a>           <span class="st">&quot;SELECT surveyID,name AS movie, rating, details</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="st">                              FROM movieRatings</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="st">                              JOIN movieName ON movieRatings.movieID = movieName.movieID</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="st">                              WHERE rating IS NULL;&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">subset</span>(movieRatingsQuery,<span class="kw">is.na</span>(movieRatingsQuery<span class="op">$</span>rating))</span></code></pre></div>
 <table class=" lightable-minimal lightable-hover" style="font-family: &quot;Trebuchet MS&quot;, verdana, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
 <tr>
@@ -2158,15 +2159,15 @@ Have not seen this movie
 <div id="modify-data" class="section level3">
 <h3>Modify data</h3>
 <p>The loaded data frame <code>movieRatings</code> obtained with a join query of <code>movieRating</code> and <code>movieName</code> databases, accounts for all data include 10 NULL values. In order to aggregate this, we again can chose to eliminate the NULL values from the SQL query used to import or from the already loaded data frame as shown below</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">dbGetQuery</span>(con,</span>
-<span id="cb7-2"><a href="#cb7-2"></a>             <span class="st">&quot;SELECT name AS movie, rating, details, count(rating)</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="st">              FROM movieRatings</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="st">              JOIN movieName ON movieRatings.movieID = movieName.movieID</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="st">              where rating IS NOT NULL </span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="st">              group by movie, rating, details </span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="st">              ORDER by movie ASC, rating DESC;&quot;</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a>            )</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">subset</span>(movieRatingsQuery,<span class="op">!</span><span class="kw">is.na</span>(movieRatingsQuery<span class="op">$</span>rating))</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">dbGetQuery</span>(con,</span>
+<span id="cb8-2"><a href="#cb8-2"></a>             <span class="st">&quot;SELECT name AS movie, rating, details, count(rating)</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="st">              FROM movieRatings</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="st">              JOIN movieName ON movieRatings.movieID = movieName.movieID</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="st">              where rating IS NOT NULL </span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="st">              group by movie, rating, details </span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="st">              ORDER by movie ASC, rating DESC;&quot;</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>            )</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">subset</span>(movieRatingsQuery,<span class="op">!</span><span class="kw">is.na</span>(movieRatingsQuery<span class="op">$</span>rating))</span></code></pre></div>
 <table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
 <tr>
