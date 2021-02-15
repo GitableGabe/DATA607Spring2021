@@ -1,7 +1,7 @@
 ---
-title: "DATA607 Week 1 Assignment - Loading Data into a Data Frame"
+title: "DATA607 Week 2 Assignment - Loading Data into a Data Frame"
 author: "Gabriel Campos"
-date: "2/2/2021"
+date: "2/14/2021"
 output:
   html_document:
     includes:
