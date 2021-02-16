@@ -1,0 +1,133 @@
+---
+title: "Tidyverse CREATE Assignment (25 points)"
+author: "Gabriel Campos"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+library(tidyverse)
+```
+
+
+
+
+Assignment Requirements
+=======================
+**Tidyverse CREATE Assignment (25 points) **
+ 
++ Clone the provided repository (1 point) 🗸
++ Write a vignette using one TidyVerse package (15 points) 
++ Write a vignette using more than one TidyVerse packages (+ 2 points) 
++ Make a pull request on the shared repository (1 point) 
++ Update the README.md file with your example (2 points) 
++ Submit your GitHub handle name & link to Peergrade (1 point) 
++ Grade your 3 peers and provide the feedback in Peergrade (2 points) 
++ Submit the best peer link & your link to Blackboard (1 point) 
+
+
+Overview
+========
+The `tidyverse package` is an open source collection of packages with very applicable and useful tools for Data Science. Installing tidyverse like any other package can be done with the `install.packages()` function. The packages I will focus on `dyplr` and `ggplot` function for my assignment.
+
+Load Data
+=========
+
+Loading the library after an installation can be done using the command below
+
+```{r}
+library(tidyverse)
+packages_var<-view(tidyverse_packages(include_self = FALSE))
+```
+
+```{r}
+colnames(packages_var)<-c("Package_name")
+```
+
+
+```{r, echo=FALSE}
+packages_var$Details<-c('[For summarizing statistic models using tiny bubbles](https://www.tidyverse.org/blog/2020/07/broom-0-7-0/)',
+            'Suite of tools for [Command Line Interface](https://cran.r-project.org/web/packages/cli/index.html)',
+            "[Colored terminal output](https://rdrr.io/cran/crayon/)",
+            "[dplyr's backend database](https://dbplyr.tidyverse.org/)",
+            "[Actions involving Data Manipulation](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8)",
+            "[Suite of tools for factors](https://forcats.tidyverse.org/)",
+            "[Suite of tools for creating plots](https://ggplot2.tidyverse.org/)",
+            "[enables R to read and write various data formats](https://www.tidyverse.org/blog/2020/06/haven-2-3-0/)",
+            "[Used for storing durations or times](https://hms.tidyverse.org/)",
+            "[Wrapper for curl package](https://www.tidyverse.org/blog/2018/12/httr-1-4-0/)",
+            "[JSON Parser and Generator for R](https://robotwealth.com/how-to-wrangle-json-data-in-r-with-jsonlite-purr-and-dplyr/)",
+            "[Intuitive date-time data tools](https://lubridate.tidyverse.org/)",
+            "[Operators for code readability](https://magrittr.tidyverse.org/)",
+            "[Modeling pipeline functions](https://modelr.tidyverse.org/)",
+            "[Column formatting tools](https://www.rdocumentation.org/packages/pillar/versions/1.4.7)",
+            "[Allows for mapping functions to data](https://purrr.tidyverse.org/)",
+            "[For reading rectangular data](https://www.rdocumentation.org/packages/readr/versions/1.3.1)",
+            "[For reading data quickly from excel files](https://readxl.tidyverse.org/)",
+            "[Wrapper for creating snippets to post on websites and messaging apps](https://www.rdocumentation.org/packages/reprex/versions/1.0.0)",
+            "[For core language features of tidyverse](https://www.rdocumentation.org/packages/rlang/versions/0.2.2)",
+            "[For conditional access to RStudios API from CRAN](https://rstudio.github.io/rstudioapi/)",
+            "[Wrapper for scraping of information off of webpages](https://www.rdocumentation.org/packages/rvest/versions/0.3.6)",
+            "[Tools for data cleaing and preparation](https://stringr.tidyverse.org/)",
+            "[For dataframe creation](https://www.rdocumentation.org/packages/tibble/versions/3.0.6)",
+            "[To 'tidy up' or simplify data](https://tidyr.tidyverse.org/)",
+            "[To enhance work with HTML and XML through R](https://xml2.r-lib.org/)"
+            )
+
+```
+
+
+
+<!-- ```{r} -->
+<!-- packages_var %>% -->
+<!--   kableExtra::kbl() %>% -->
+<!--   kableExtra::kable_material_dark() -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- htmlTable(packages_var, -->
+<!--           cgroup = c("Set 1:1", "Set 2:4"), -->
+<!--           n.cgroup = c(2, 2), -->
+<!--           rnames = FALSE) -->
+<!-- ``` -->
+
+
+Vignette
+---------------------------------------
+
+### Source Information:
+
+(a) Creator: Gabriel Campos
+(b) Personal Survey: **[surveymonkey.com](https://www.surveymonkey.com/r/R65336R)** \newline
+**NOTE:** *To avoid $25 monthly subscription with SurveyMonkey, I created .csv for my long-time* \newline
+*imaginary friends' survey results, to simulate what I imagine the data export would look like.*
+(c) Github: **[github.com/gcampos100/ .CSV & SQL files](https://github.com/gcampos100/DATA607Spring2021/tree/main/Week%202)**
+\clearpage
+
+### Connecting
+
+Connection is established using the Open Database Connectivity [(ODBC)](https://docs.microsoft.com/en-us/sql/odbc/reference/what-is-odbc) configured on my local machine to connect to MySQL with a user that has **[read privileges](https://www.techbeamers.com/mysql-grant-privileges/)** on my specified table.
+
+
+### Importing the Data
+Using the **[dbGetQuery() function](https://www.rdocumentation.org/packages/DBI/versions/0.5-1/topics/dbGetQuery)** which is a part of the **[DBI package](https://db.rstudio.com/dbi/)** I was able to run a SQL query directly and import the results onto a dataframe for further use. \newline
+
+**NOTE:** *Importing of NULL values in database, converts to NA in the dataframe.*
+
+
+
+Conclusions
+===========
