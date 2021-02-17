@@ -28,8 +28,8 @@ Assignment Requirements
 **Tidyverse CREATE Assignment (25 points) **
  
 + Clone the provided repository (1 point) 🗸
-+ Write a vignette using one TidyVerse package (15 points) 
-+ Write a vignette using more than one TidyVerse packages (+ 2 points) 
++ Write a vignette using one TidyVerse package (15 points) 🗸 
++ Write a vignette using more than one TidyVerse packages (+ 2 points) 🗸 
 + Make a pull request on the shared repository (1 point) 
 + Update the README.md file with your example (2 points) 
 + Submit your GitHub handle name & link to Peergrade (1 point) 
@@ -110,7 +110,7 @@ As explained in `Table A-1` Reprex is a *Wrapper for creating snippets to post o
 
 As explained in `Table A-1` ggplot2 is a suite for tools for creating plots. The data used in creating the below ggplot comes from the `openintro` package. `OpenIntro` package details can be found below.
 
-(a) `ggplot2` website : [rdocumentation.org/packages/ggplot2/versions/3.3.3](https://www.rdocumentation.org/packages/ggplot2/versions/3.3.3) 
+(a) `ggplot2` website : **[rdocumentation.org/packages/ggplot2/versions/3.3.3](https://www.rdocumentation.org/packages/ggplot2/versions/3.3.3)** 
 (b) `ggplot` Github: **[github.com/cran/ggplot2](https://github.com/cran/ggplot2)**
 
 ### Loading data
@@ -125,7 +125,7 @@ The data used to create the plot, is the dataset `evals` from the `OpenIntro` pa
 
 ### Step 1: Load Library
 
-```{r}
+```{r, results='hide',message=FALSE}
 #Load library
 library(openintro)
 ```
@@ -133,12 +133,12 @@ library(openintro)
 ### Step 2: Load Data
 
 ```{r, messages = FALSE}
-## Load Dataset `evals`
+## Load Dataset `evals` from `OpenIntro`
 data(evals)
 head(evals)
 ```
 
-### Step 3: Load Library
+### Step 3: Prepare Data
 
 Dataframe `manipulated` data is created using specifically columns `prof_id` and `score` from `evals` data set. Data is then condensed using `group_by()` function and a new column `no_rows` is added to the dataframe as shown below
 
@@ -152,17 +152,26 @@ manipulated_data<-manipulated_data %>%
   summarise(no_rows = length(Score))
 ```    
 
-### Plot
+### Step 4: Plot
 
-Plotting with ggplot2 the plot type has to be chosen with additional functions such as `geom_line`,`geom_density`,`geom_histogram()`,`geom_point()`, etc. Multiple aesthetics can be applied in one graph as well, as shown by running `y=no_rows))+geom_histogram(aes(x=no_rows,..density..))+geom_density(aes(x=no_rows,..density..), color = "red", size=3)`
+Plotting with ggplot2 the plot type has to be chosen with additional functions such as `geom_line`, `geom_density`, `geom_histogram()`, `geom_point()`, etc. \newline
+Multiple aesthetics can be applied in one graph as well, as shown by running \newline 
+
+            ggplot(data = manipulated_data,aes(x=Score, y=no_rows))+
+            geom_histogram(aes(x=no_rows,..density..))+
+            geom_density(aes(x=no_rows,..density..), color = "red", size=3)
+
+--------------------
 
 ```{r ggplot_manipulated_data_basic,warning=FALSE,message=FALSE, include=TRUE,fig.show = "hold", out.width="50%", fig.height=4}
 ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_line()
 ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_density(aes(x=no_rows,..density..))
 ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_histogram(aes(x=no_rows,..density..))
 ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_point()
-ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_histogram(aes(x=no_rows,..density..))+
-geom_density(aes(x=no_rows,..density..), color = "red", size=3)
+
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+
+    geom_histogram(aes(x=no_rows,..density..))+
+    geom_density(aes(x=no_rows,..density..), color = "red", size=3)
 ```
 
 Below would be an example of a more complex variation, utilizing `geom_text()`,`labs()`,`theme()` and `scale_x_continous()` to create a more complex plot.
@@ -210,24 +219,6 @@ ggplot(data = manipulated_data, aes(x=Score, y=no_rows,fill=no_rows)) +
 
 ![CONSOLE_OUTPUT](code_snippet_console.png)
 
+The resulting snippet allows for an easy copy & paste with full graphics available
 
-
-
-
-
-
-
-
-
-your console output should appear as \newline
-
-$>$ $reprex::reprex()$ \newline
-
-$x \ Install \ the \ styler \ package \ in \ order \ to \ use$ `style = TRUE`. \newline
-
-$i \ Rendering \ reprex...$ \newline
-
-$v \ Rendered \ reprex \ is \ on \ the \ clipboard.$ \newine
-
-Conclusions
-===========
+![Giihub Load Example](github_load_ex.png)
