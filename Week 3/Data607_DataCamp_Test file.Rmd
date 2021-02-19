@@ -1,0 +1,27 @@
+---
+title: "Introduction to DATA607 CUNY SPS"
+author: ""
+output:
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = FALSE)
+library(tidyverse)
+library(openintro)
+library(viridis)
+library(marmap)
+library(knitr)
+library(reticulate)
+```
+
