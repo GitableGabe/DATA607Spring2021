@@ -273,7 +273,8 @@ ggplot(data=movie_avg, aes(x=movie_avg$movie, y=movie_avg$MeanRating)) +
     geom_bar(aes(fill=movie_avg$movie),colour="black",stat="identity")+
     guides(fill=FALSE)+
     xlab("MOVIE RATING") + ylab("MOVIE TITLE")+
-    ggtitle("AVERAGE RATING OF MOVIES")
+    ggtitle("AVERAGE RATING OF MOVIES")+
+    coord_flip() 
 ```
 
 
