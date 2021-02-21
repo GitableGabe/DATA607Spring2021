@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/728683/50552cdb0f814c079c5788f77a924082
+bundleId: https://api.rpubs.com/api/v1/document/728683/50552cdb0f814c079c5788f77a924082
+url: http://rpubs.com/gcampos100/728683
+when: 1613913906.13766

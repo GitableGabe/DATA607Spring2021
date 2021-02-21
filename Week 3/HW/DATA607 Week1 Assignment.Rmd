@@ -1,7 +1,7 @@
 ---
-title: "DATA607 Week 1 Assignment - Loading Data into a Data Frame"
+title: "DATA607 Week 3 Assignment - Loading Data into a Data Frame"
 author: "Gabriel Campos"
-date: "2/2/2021"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
 output: 
   html_document:
     includes:
@@ -17,6 +17,7 @@ editor_options:
 ---
 
 ```{r, echo=FALSE,warning=FALSE}
+library(stringr)
 library(kableExtra)
 ```
 
@@ -43,31 +44,32 @@ Into a format like this:
 
 3. Describe, in words, what these expressions will match:
 
-      (.)\1\1
-      "(.)(.)\\2\\1"
-      (..)\1
-      "(.).\\1.\\1"
-      "(.)(.)(.).*\\3\\2\\1"
+ ![](Q3.png)
+      
 
 4. Construct regular expressions to match words that:
 
-    Start and end with the same character.
-    Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+    Start and end with the same character.\newline
+    
+    Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)\newline
+    
     Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
 
-Overview
-========
+Question 1
+==========
 
 `The Economic Guide To Picking A College Major` article data is stored on the [fivethirtyeight github](https://github.com/fivethirtyeight/data/tree/master/college-majors). I will be importing my data from the [majors=list.csv](https://github.com/fivethirtyeight/data/blob/master/college-majors/majors-list.csv) and the [grad-students.csv](https://github.com/fivethirtyeight/data/blob/master/college-majors/grad-students.csv) respectively.
 
 ```{r}
 majors_list<-
-  read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv", header= TRUE, sep=",")
+read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv",
+           header= TRUE, sep=",")
 
 majors_list<-majors_list[order(majors_list$Major),]
 
 grad_students<-
-  read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/grad-students.csv", header= TRUE, sep=",")
+read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/grad-students.csv", 
+           header= TRUE, sep=",")
 
 grad_students<-grad_students[order(grad_students$Major),]
 ```
@@ -79,9 +81,133 @@ paste0("Columns for grad_students are:")
 names(grad_students)
 ```
 
+## ANSWER
+
+**The majors that contain either "DATA" or "STATISTICS" in them, are as follows, according to both datasets:**
+
 ```{r}
 dplyr::filter(majors_list, grepl('data|Data|DATA|statistic|Statistic|STATISTIC', Major))
 
 dplyr::filter(majors_list, grepl('data|Data|DATA|statistic|Statistic|STATISTIC', Major))
 ```
+
+Question 2
+===========
+
+Write code that transforms the data below: \newline
+
+**NOTE: the data below is in a matrix with the number values in brackets representing the row name.**
+
+```{r, echo=FALSE}
+#Matrix creation
+x_matrix<-rbind(c("bell pepper","bilberry","blackberry","blood orange"),
+      c("blueberry","cantaloupe","chili pepper","cloudberry"),
+      c("elderberry","lime","lychee","mulberry"),
+      c("olive","salal berry",'',""))
+# Matching rownames
+row.names(x_matrix)<-c("[1]","[5]","[9]","[13]")
+
+x_matrix
+```
+
+Into a format like this:
+    c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+    
+## ANSWER
+
+```{r}
+quotes = '"'
+quotes
+```
+
+```{r}
+# Make vector
+x_vector<-as.vector(t(x_matrix[c("[1]","[5]","[9]","[13]"),]))
+# Remove "" based on index search
+x_vector<- x_vector[-(match("",x_vector))]
+x_vector<- x_vector[-(match("",x_vector))]
+# add quotes on each element
+x_vector <-paste(quotes,x_vector,quotes, sep = "")
+# add commas at the end of all elements but the last one
+x_vector <- paste(c("","","","","","","","","","","","","",""), x_vector, sep = "")
+# collapse to a single string
+x_vector <- paste(x_vector, collapse = ", ")
+# add 'C()' wrapper
+x_vector <- paste("c(",x_vector, ")", sep = "")
+cat(x_vector)
+```
+
+
+Question 3
+==========
+
+    (.)\1\1                   |`( )` group
+                              |`(.)` match-any-character operator matches any character except line
+                              |      terminator
+                              |`\1`  back-reference-operator references capturing group `\1`
+                              |`\1`  the second is just to replace duplicate words of group `\1`
+                              |NOTE: Regex requires `\` escapes with `R` functions since parameter is inserted
+                              |       as a string. This combiniation finds triples.
+                              |
+    "(.)(.)\\2\\1"            |`( )` group
+                              |`(.)` match-any-character operator group 1
+                              |`(.)` match-any-character operator group 2
+                              |`\\2` back-reference-operator with `\` to escape references capturing group `\2`
+                              |`\\1` back-reference-operator with `\` to escape references capturing group `\1`
+                              |NOTE: Regex matches 2 groups of doubles such as `bbbb` or `abba`
+                              |
+    (..)\1                    |`(..)` same as match-any-character group 1
+                              |`\1`  back-references group `\1`
+                              |NOTE: Requires `\` escape. Regex finds 1 group of quadruples
+                              |
+    "(.).\\1.\\1"             |. Works as wild cards outside of `( )`. Regex searches for a repeated character
+                              |3 times and seperated by any character
+                              |
+    "(.)(.)(.).*\\3\\2\\1"    |`(.)(.)(.)` 3 grouping
+                              |. wild card for string beginning with group
+                              |* 0 to ∞ combinations with these specific regex
+                              |`\\3\\2\\1` back-reference 3 seperate groups
+                              |This expression finds 3 seperate groups of matching characters
+
+
+
+```{r, echo=FALSE}
+example<-c("abcd","1234","!@#$*(&^","eeffggeeeffggg","5678","2","banana","abaca","aabbbbaaa","abba")
+```
+
+## ANSWER
+
+```{r, echo=TRUE, results='show'}
+# Regex example (.)\1\1
+str_view(example,"(.)\\1\\1",match = T)
+
+# Regex example "(.)(.)\\2\\1"
+str_view(example,"(.)(.)\\2\\1",match = T)
+
+# Regex example (..)\1
+str_view(example,"(..)\\1",match = T)
+
+# Regex example  "(.).\\1.\\1" 
+str_view(example,"(.).\\1.\\1",match = T)
+
+# Regex example  "(.)(.)(.).*\\3\\2\\1"
+str_view(example,"(.)(.)(.).*\\3\\2\\1",match = T)
+```
+
+Question 4
+==========
+
+## ANSWER
+
+```{r, echo=TRUE, results='show'}
+# Start and end with the same character.
+str_view(example,"^(.).*\\1$",match = T)
+# Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+str_view(example, "(..).*\\1",match = T)
+#Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+str_view(example,"(.).*\\1.*\\1",match = T)
+
+
+```
+
 
