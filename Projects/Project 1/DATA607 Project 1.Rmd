@@ -1,0 +1,334 @@
+---
+title: "DATA607 Project 1"
+author: "Gabriel Campos"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=FALSE,warning=FALSE}
+library(stringr)
+library(tidyr)
+library(dplyr)
+```
+
+
+Assignment Requirements
+=======================
+
+
+
+
+Procedure
+=========
+
+## Import Data
+
+Data is imported from the text file path leading to `tournamentinfo.txt` from my [github Project 1 folder](https://github.com/gcampos100/DATA607Spring2021/tree/main/Projects/Project%201). Function `read.delim` from the `utils` package is used. 
+
+```{r}
+# Store Github url to variable
+txtfile= 
+"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%201/
+tournamentinfo.txt"
+```
+
+The text file is converted into a data.frame separated by the delimiter `|` and not claiming a `header`, resulting in 11 columns vs. the actual 10 in the file.
+
+```{r}
+my_data <- as.data.frame(read.delim(txtfile,header = FALSE,stringsAsFactors = FALSE, sep = "|"))
+```
+
+Note[^1]
+
+[^1]:Column 10 was ommitted from head() for formatting:
+```{r, echo=FALSE}
+head(my_data[,1:9],4)
+```
+
+## Cleaning Imported Data
+
+### Step 1: Remove `---` rows and `NULL` values
+
+The data.frame my_data is a 2 dimensional data.frame containing `11 columns` and `195 rows`. Rows composed completely of `---` and the additional all `NULL` column created on import needs to be removed.
+
+```{r}
+#Find rows to delete, multiples of 3
+toDelete    <- seq(1, length(my_data$V1), 3)
+#remove rows
+my_data     <- my_data[-toDelete ,]
+# remove column with NULL Values
+my_data[11] <-NULL
+```
+
+
+Note[^2]
+
+[^2]:Column 9 & 10 was ommitted from head() for formatting:
+```{r, echo=FALSE}
+head(my_data[,1:8],3)
+```
+
+### Step 2: Subset header and body
+
+The header is composed of 2 rows that require merging and separation by column. In order to do so and to avoid affecting the additional data, I subset the first two rows individually and separate the table's body content.
+
+```{r}
+# Subset column names and remainder of vectors
+# Subset row 1 of my data
+my_data_names <- my_data[1,]
+# Subset row 2 of my data
+my_data_names_2 <- my_data[2,]
+# Subset remainder of my data
+my_data<-my_data[3:NROW(my_data),]
+```
+
+### Step 3: Use header subsets to create column names
+
+Using `str_replace` in combination with `gsub()` and some `regex` expressions, I am able to remove the unnecessary information from the rows then combine them. The end result will be the exact or near exact column names needed for this dataset.
+
+```{r}
+# Merge both vectors and seperate by `,`
+my_data_names <- paste(my_data_names,my_data_names_2,collapse = ",")
+# Replace any character issues
+my_data_names <- str_replace(my_data_names, "/",",")
+my_data_names <- str_replace(my_data_names, "->"," , ")
+my_data_names <- str_replace(my_data_names, "\\(","")
+my_data_names <- str_replace(my_data_names, "Post\\)","Rtg Post")
+# Remove excessive spacing
+my_data_names <-str_replace(gsub("\\s\\s", " ", str_trim(my_data_names)), "B", "b")
+# Add comma to attribute `Player Name`
+my_data_names <-str_replace(gsub("Player Name", "Player Name,",my_data_names),"B", "b")
+```
+
+
+```{r, echo=FALSE}
+my_data_names<-unlist(strsplit(my_data_names, ","))
+```
+
+### Step 4 : Use body subset to create columns
+
+The relevant data is split among 2 rows, $\therefore$ I separated the data set into 2 halves in order to rejoin in combined columns. Similar as with the column names, I used a `sequence` to store the `index` of all odd number `indexes` in the `data frame` and created `subsets` of the relevant data.
+
+```{r}
+# Subset of top using index
+top    <- seq(1, length(my_data$V1), 2)
+my_data_top         <- my_data[top ,]
+# Subset of bottom using index
+bottom     <- seq(2, length(my_data$V1), 2)
+my_data_bottom          <- my_data[bottom ,]
+
+```
+
+Note[^3]
+
+[^3]:Columns 1 & 10 was ommitted from head() for formatting:
+```{r, echo=FALSE}
+paste0("TOP")
+head(my_data_top[,2:9],2)
+paste0("BOTTOM")
+head(my_data_bottom[,2:9],2)
+```
+
+
+### Step 5 : First Data cleanup and consolidation
+
+In order to merge the data cleanly and to allow easy edit of output, I:
+
+* converted each `subset` into a `list`
+* Removed data in `my_data_bottom` not needed for the assignment
+* Combined the rows into a single column
+* Then cleanup or add any characters or symbols that is inhibiting the creating of a table
+
+```{r}
+# List conversion
+my_data_top <- as.list(t(my_data_top))
+my_data_bottom<- as.list(t(my_data_bottom))
+```
+
+Note[^4]
+
+[^4]:Regex was used to add `|` character. Although not very intuitive, the pasting of data created issues separating column 1 `Pair Num` and `State`, hence `|` was added to use as a delimeter later on:
+```{r}
+# Unnecessary Data removal
+my_data_bottom<-str_replace_all(gsub("W|B|b|P[1-9]|P[1-9][0-9]", " ",my_data_bottom),"B", "b")
+my_data_bottom<-str_replace_all(gsub("O", "| O",my_data_bottom),"B", "b")
+my_data_bottom<-str_replace_all(gsub("M", "| M",my_data_bottom),"B", "b")
+my_data_bottom<-str_replace_all(gsub("N\\:.", " ",my_data_bottom),"B", "b")
+```
+
+
+```{r}
+# clean paste or merger of rows
+my_data <- paste(my_data_top,my_data_bottom,collapse = ",")
+```
+
+
+```{r}
+# Overall cleanup of data
+my_data <-str_replace(gsub("/ R:", ",",my_data),"B", "b")
+my_data <-str_replace(gsub("->", ",",my_data),"B", "b")
+my_data <-str_replace(gsub("\\s+", " ", str_trim(my_data)), "B", "B")
+```
+
+The result of the cleanup is a list of all variables, comma separated, **WITH EXCEPTION** of `Player Name` and `USCF ID`.
+
+```{r, echo=FALSE}
+str(my_data)
+```
+
+### Step 6: Data Frame recreation
+
+```{r, include=FALSE}
+#test.matrix<-matrix(unlist(test.split), ncol = 12, byrow = TRUE)
+```
+
+Using the list I recreate the data body data frame with column name data
+
+```{r}
+my_data<-strsplit(my_data[1],",")
+my_data <- data.frame(matrix(unlist(my_data), ncol=12, byrow=TRUE))
+```
+
+Note[^5]
+
+[^5]:Column 10-12 was ommitted from head() for formatting:
+```{r, echo=FALSE}
+head(my_data[,1:9],2)
+```
+
+Specifically column `X2` needs to be separated using `str_split_fixed`
+```{r, echo = FALSE}
+paste0(my_data$X2[1])
+paste0(my_data$X2[2])
+```
+
+```{r}
+quick.split<-str_split_fixed(my_data$X2, "\\s[0-9]", 2)
+my_data<-cbind(my_data[1],quick.split,my_data[3:12])
+```
+
+This will to create the 13 columns we require with `my_data_names`
+
+```{r, echo=FALSE}
+head(my_data,1)
+```
+
+Unfortunately, the `State` column name was not accounted for with `Pair Num` 's aggregate data, hence we have to seperate the first column `X1` using the below command.
+
+Note[^6]
+
+[^6]:This is where the added `|` is used as a delimeter:
+```{r}
+my_data<-my_data %>%
+  separate(X1, c(my_data_names[1], "State"), "\\|")
+```
+
+Then the remaining names can be added using the list `my_data_names`
+
+```{r}
+colnames(my_data)[colnames(my_data)
+            %in% c("1", "2","X3","X4","X5","X6","X7","X8","X9","X10","X11","X12")] <- my_data_names[2:13]
+```
+
+
+```{r, echo=FALSE}
+head(my_data,1)
+my_data <- apply(my_data,2,toupper)
+```
+
+
+Calculating Average
+--------------------
+
+I created a vector Average to store the calculated values that will be put into the data frame later on.
+
+```{r, results=FALSE}
+Average<-c(1:64)
+```
+
+```{r, echo=FALSE}
+dim(my_data)
+```
+
+
+The logic for the below `for loop` is as follows
+* Initial loop goes from the first row `1` to the maximum row `nrow`
+* Initial column for each row is `7` indexing the `Round 1` column to the maximum column `ncol`.
+* Index `i` is retrieved as a numeric value
+* `i` is used to index the `row` of opponents data, with `4` indexing `Rtg Pre` value as a numeric
+* Value is calculated into `sum` initialized in the first `for loop` as 0, if it passes the conditional `if statement` of not `NA` $\\!is.na$.
+* Else statement, tallies number of `NA` values.
+* Upon completion of the inner loop, an average for that row is calculated and stored to vector `Average` indexing the same row that is calculated.
+* Average calculation = $round(\frac{sum}{column_{\#of}-NA_{\#of}})$
+
+```{r, results=FALSE}
+for(row in 1:nrow(my_data)){
+    sum = 0
+    columns.na=0
+  for(col in 8:ncol(my_data)){
+    i<-as.numeric(str_extract(my_data[row,col],"[1-9]."))
+        if(!is.na(i)){
+      print(i)
+      sum = sum + as.numeric(my_data[i,5])
+        }
+      else columns.na=columns.na+1
+  }
+  #print(columns.na)
+  #print(sum)
+  #print(round((sum/((ncol(my_data)-7)-columns.na))))
+  Average[row]<-round((sum/((ncol(my_data)-7)-columns.na)))
+}
+```
+
+Once the loop ends and the `Average` vector is filled, I use `cbind()` to combined the data frame and vector by column
+
+```{r}
+my_data<-cbind(my_data,Average)
+```
+
+```{r, echo=FALSE}
+head(my_data[,1:15],3)
+```
+
+Convert to CSV
+--------------
+
+The requirements for the submission is as follows
+
+      Player’s Name, Player’s State, Total Number of Points, Player’s 
+      Pre-Rating, and Average Pre Chess Rating of Opponents
+
+$\therefore$ I subset the data before converting to a `.csv`
+
+```{r}
+colnames(my_data)
+```
+
+```{r}
+#my_data<-as.data.frame(my_data)
+Project_1_csv<-as.data.frame(my_data) %>%
+  select(" Player Name",State,"Total Pts "," Rtg Pre ","Average")
+head(Project_1_csv)
+```
+
+After which, I create a .csv file from the data frame using a local github path
+
+```{r}
+cloned_git_PATH <- rstudioapi::askForPassword("Enter Path:")
+```
+
+```{r}
+write.csv(Project_1_csv,
+          cloned_git_PATH)
+```
