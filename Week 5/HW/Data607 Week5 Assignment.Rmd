@@ -17,18 +17,91 @@ editor_options:
 ---
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE, results = FALSE)
+knitr::opts_chunk$set(eval = TRUE, results = "hold")
 library(tidyverse)
 ```
 
+Overview
+========
 
-## Import Data
+![](table.png){ width=50% }
 
-Data is imported from the `.csv` file located in my [github Week 5 folder](https://github.com/gcampos100/DATA607Spring2021/tree/main/Projects/Project%201). Function `read.delim` from the `utils` package is used. 
+The chart above describes arrival delays for two airlines across five destinations. Your task is to:
+
+1. Create a **.CSV file** (or **optionally**, a MySQL database!) that includes all of the information above.
+      +   You’re encouraged to use a “wide” structure similar to how the information appears above, so that you can practice tidying and transformations as described below.
+2. Read the information from your **.CSV** file into$\ R$, and use `tidyr` and `dplyr` as needed to *tidy*
+and transform your data.
+3. Perform **analysis to compare** the **arrival delays** for the **two airlines**.
+4. Your code should be in an$\ R \ Markdown$ **file**, posted to [RPUBS](rpubs.com), and should include **narrative descriptions** of your **data cleanup work**, **analysis**, and **conclusions**. Please include in your homework submission:
+      * The URL to the .Rmd file in your GitHub repository. and
+      * The URL for your rpubs.com web page.
+
+Import Data
+===========
+
+Data is imported from the `.csv` file located in my [github Week 5 folder](https://github.com/gcampos100/DATA607Spring2021/tree/main/Projects/Project%201). Function `read.csv` from the `utils` package is used. 
+
+```{r, echo=FALSE}
+# Store Github url to variable
+url= 
+"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%205/HW/arrival_delays.csv"
+```
 
 ```{r}
-# Store Github url to variable
-txtfile= 
-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%201/
-tournamentinfo.txt"
+arrivals_delays <- read.csv(url, as.is = TRUE)
 ```
+
+```{r, echo=FALSE}
+kableExtra::kbl(arrivals_delays,booktabs = T, caption = "arrivals_delays") %>%
+  kableExtra::kable_styling() %>%
+kableExtra::footnote("The present table reflects the NULL cells and unlabeled columns in the .csv file",general_title = "NOTE:" ,title_format = "bold")
+```
+
+Cleanup
+=======
+
+The above data set has a few problems that need correct including:
+
+* Removal of row comprised of empty cells (`  `) and `NA`
+* Relabeling of column names for functional use
+* Inserting logical data, for blank cells in column 1.
+
+### `NA` Removal
+
+The only row requiring removal is row 3. This is done using the bracket `[ ]` in conjunction with `-` symbol to specify removal of the selected row.  
+
+```{r}
+(arrivals_delays <- arrivals_delays[-3,])
+```
+
+### Relabeling of `colnames`
+
+Since all but two columns are labeled incorrectly a list of names is best to insert into the data frame.
+
+```{r}
+df_names <- c("Airline", "Arrival", "Los Angeles", "Phoenix", "San Diego", "San Francisco", "Seattle")
+colnames(arrivals_delays) <- df_names
+```
+
+```{r, echo=FALSE}
+arrivals_delays
+```
+
+### Inserting Data
+
+The most logical data to place inside the empty cells in column one, is the *Airline* being referenced. Rather than manually type in the name I chose to reference the Airline name in the row before the blank one. Had this been a larger data set a *while loop* my be a helpful tool.
+
+```{r}
+
+(arrivals_delays[2,1]<-arrivals_delays[1,1])
+(arrivals_delays[4,1]<-arrivals_delays[3,1])
+```
+
+```{r, echo=FALSE}
+kableExtra::kbl(arrivals_delays,booktabs = T, caption = "arrivals_delays",row.names = FALSE) %>%
+  kableExtra::kable_classic_2()
+```
+
+
+
