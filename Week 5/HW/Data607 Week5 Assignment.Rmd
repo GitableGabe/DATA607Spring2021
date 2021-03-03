@@ -1,0 +1,34 @@
+---
+title: "DATA607 Week 5 Assignment"
+author: "Gabriel Campos"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = FALSE)
+library(tidyverse)
+```
+
+
+## Import Data
+
+Data is imported from the `.csv` file located in my [github Week 5 folder](https://github.com/gcampos100/DATA607Spring2021/tree/main/Projects/Project%201). Function `read.delim` from the `utils` package is used. 
+
+```{r}
+# Store Github url to variable
+txtfile= 
+"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%201/
+tournamentinfo.txt"
+```

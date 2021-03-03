@@ -1,0 +1,120 @@
+---
+title: "DATA607 Week 5 Lab"
+author: "Gabriel Campos"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = FALSE)
+library(tidyverse)
+library(nycflights13)
+packageDescription("nycflights13")
+```
+
+```{r, echo=FALSE}
+nycflights13::flights
+```
+
+```{r, results='hold'}
+(jan<- filter(flights,month == 1, day == 1))
+```
+
+Example of approximation
+========================
+
+```{r}
+sqrt(2)^2 == 2
+#vs
+near(sqrt(2)^2, 2)
+```
+
+AND , OR Operators
+==================
+
+```{r, results='hold'}
+filter(flights,month == 11 | month == 12)
+```
+
+Short-Hand
+===========
+
+Note[^1]
+
+[^1]:[from data transformation doc](https://r4ds.had.co.nz/transform.html):
+A useful short-hand for this problem is x %in% y. This will select every row where x is one of the values in y. We could use it to rewrite the code above:
+
+```{r, results='hold'}
+(nov_dec <- filter(flights, month %in% c(11,12)))
+```
+
+Note[^a]
+
+[^a]:[from data transformation doc](https://r4ds.had.co.nz/transform.html):
+Sometimes you can simplify complicated subsetting by remembering De Morgan’s law: !(x & y) is the same as !x | !y, and !(x | y) is the same as !x & !y. For example, if you wanted to find flights that weren’t delayed (on arrival or departure) by more than two hours, you could use either of the noted two filters
+
+```{r, results='hold'}
+filter(flights, !(arr_delay>120 | dep_delay > 120))
+filter(flights, arr_delay <= 120, dep_delay <= 120)
+```
+
+Handling NA's
+=============
+
+```{r, results='hold'}
+(df<- tibble(x =c(1,NA,3)))
+filter(df,x>1)
+filter(df,is.na(x)|x>1)
+```
+
+Exercises
+=========
+
+1. Find all flights that:
+
+  + Had an arrival delay of two or more hours
+  + Flew to Houston (IAH or HOU)
+  + Were operated by United, American, or Delta
+  + Departed in summer (July, August, and September)
+
+```{r}
+colnames(flights)
+```
+
+```{r}
+# Regex to check if and combination other than DL exists
+str_view(flights$carrier, "^D.", match = TRUE)
+str_view(flights$carrier, "^D(?!L)", match = TRUE)
+```
+
+
+```{r}
+df_f<-filter(flights, arr_delay > 2, dest == "IAH"| dest =="HOU", carrier == "UA"|carrier == "DL"|carrier == "AA")
+df_f[,c("arr_delay","dest","carrier")]
+```
+
+## Using `between()` Function
+
+2. Departed between midnight and 6am (inclusive)
+
+```{r}
+# Regex to check if and combination other than DL exists
+#str_view(flights$dep_time, "^12|^6", match = TRUE)
+str_view(flights$dep_time, "^[1-2][3-9][1-9][1-9]|^[2][1-9][1-9][1-9]", match = TRUE)
+```
+
+```{r}
+filter(flights,between(dep_time, 0000,600))
+```
+
