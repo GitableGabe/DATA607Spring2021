@@ -61,7 +61,7 @@ kableExtra::footnote("The present table reflects the NULL cells and unlabeled co
 Cleanup
 =======
 
-The above data set has a few problems that need correct including:
+The above data set has a few problems that need correcting including:
 
 * Removal of row comprised of empty cells (`  `) and `NA`
 * Relabeling of column names for functional use
@@ -69,7 +69,7 @@ The above data set has a few problems that need correct including:
 
 ### `NA` Removal
 
-The only row requiring removal is row 3. This is done using the bracket `[ ]` in conjunction with `-` symbol to specify removal of the selected row.  
+The only row requiring removal is row 3. This is done using brackets `[ ]` in conjunction with `-` symbol to specify removal of the selected row.  
 
 ```{r}
 (arrivals_delays <- arrivals_delays[-3,])
@@ -77,10 +77,13 @@ The only row requiring removal is row 3. This is done using the bracket `[ ]` in
 
 ### Relabeling of `colnames`
 
-Since all but two columns are labeled incorrectly a list of names is best to insert into the data frame.
+Since all but two columns are labeled correctly, a list of names is best to insert into the data frame.
 
 ```{r}
-df_names <- c("Airline", "Arrival", "Los Angeles", "Phoenix", "San Diego", "San Francisco", "Seattle")
+df_names <-
+  c("Airline", "Arrival", "Los Angeles", "Phoenix",
+    "San Diego", "San Francisco", "Seattle")
+
 colnames(arrivals_delays) <- df_names
 ```
 
@@ -90,12 +93,12 @@ arrivals_delays
 
 ### Inserting Data
 
-The most logical data to place inside the empty cells in column one, is the *Airline* being referenced. Rather than manually type in the name I chose to reference the Airline name in the row before the blank one. Had this been a larger data set a *while loop* my be a helpful tool.
+The most logical data to place inside the empty cells in column one, is the *Airline* being referenced. Rather than manually type in the name I chose to reference the Airline name in the row before the blank one. Had this been a larger data set a *while loop* may have been a helpful tool.
 
 ```{r}
 
-(arrivals_delays[2,1]<-arrivals_delays[1,1])
-(arrivals_delays[4,1]<-arrivals_delays[3,1])
+arrivals_delays[2,1]<-arrivals_delays[1,1]
+arrivals_delays[4,1]<-arrivals_delays[3,1]
 ```
 
 ```{r, echo=FALSE}
@@ -103,5 +106,148 @@ kableExtra::kbl(arrivals_delays,booktabs = T, caption = "arrivals_delays",row.na
   kableExtra::kable_classic_2()
 ```
 
+## Transforming columns and rows
+
+### Gather()
+
+Using [gather() function](https://www.rdocumentation.org/packages/tidyr/versions/0.8.3/topics/gather) along with *pipe* `%>%` I reorganize the data so the counts and cities are accounted for on two columns. 
+
+* `key` is the name of the *new key* or column holding the previous **column names**
+* `value`  is the name of the column holding the **values** associated with said **key** values.
+
+```{r, results='hold'}
+(arrivals_delays_steps<-arrivals_delays %>%
+  gather(key = "City",value = "Count", 3:7))
+```
+
+### Spread()
+
+Using [spread() function](https://www.rdocumentation.org/packages/tidyr/versions/0.8.3/topics/spread)  
+
+* `key` is the column name or positions we are referencing.
+* `values` are still the values affiliated with the key, but graphically the reference is lateral. Technically the shared relationship for these options is a single row.
+* Columns $\ 2 \ \&\ 4$ are referenced.
+**e.g.**[^1]
+
+[^1]:`arrivals_delays[2]` and `arrivals_delays[4]` for columns 2 & 4 respectively:
+
+```{r, results='hold'}
+(arrivals_delays_steps<-arrivals_delays_steps %>%
+  spread(key = 2,value = 4))
+```
+
+### Arrange()
+
+Using the [arrange() function](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/arrange) I sort the data by city
+
+```{r}
+arrivals_delays_steps %>%
+  arrange(City)
+```
+
+### Single command
+
+Alternatively all step can occur at once
+
+```{r}
+(arrivals_delays<-arrivals_delays %>%
+  gather(key = "City",value = "Count", 3:7)%>%
+    spread(key = 2,value = 4) %>%
+        arrange(City))
+```
+
+### Calculations
+
+The Calculations are as follows:
+
+* `Total Flights` = `delayed` + `on time` values by row.
+* The for loop traverses each row, calculating `Total Flights` and storing it in the corresponding row.
+* `Delay Rate` and `On Time Rate` are calculated by dividing entire columns:
+  + `delayed`/`Total Flights`
+  + `on time`/`Total Flights`
+
+```{r, include=FALSE}
+dim(arrivals_delays)
+nrow(arrivals_delays)
+arrivals_delays[1,3]
+```
+
+```{r, include = FALSE}
+#total_flights<-c(10)
+#delay_rates<-c(10)
+#on_time_rate<-c(10)
+arrivals_delays$`on time`
+```
 
 
+```{r, results=FALSE}
+# for loop to create totals
+for(row in 1:nrow(arrivals_delays))
+  arrivals_delays$`Total Flights`[row]<-
+  as.numeric(arrivals_delays[row,3])+
+  as.numeric(gsub(",","",arrivals_delays[row,4]))
+
+#outside of for loop calculations for rates
+  arrivals_delays$`Delay Rate`<-
+    round( as.numeric( arrivals_delays$delayed ) / arrivals_delays$`Total Flights`,2 ) 
+
+#arrival rates calculations
+  arrivals_delays$`On Time Rate`<-
+    round( as.numeric( gsub(",","",arrivals_delays$`on time` )) / arrivals_delays$`Total Flights`,2 ) 
+
+```
+
+```{r, echo=FALSE}
+kableExtra::kbl(arrivals_delays,booktabs = T, caption = "arrivals_delays",row.names = FALSE) %>%
+  kableExtra::kable_minimal()
+```
+
+```{r, echo=FALSE}
+plot_no_filter<-arrivals_delays %>%
+  select(Airline , City, `Delay Rate`,`On Time Rate`)
+
+plot_AK_del<-arrivals_delays %>%
+  select(Airline , City, `Delay Rate`,`On Time Rate`) %>%
+    filter(Airline == "ALASKA")
+
+plot_AM_del<-arrivals_delays %>%
+  select(Airline , City, `Delay Rate`,`On Time Rate`) %>%
+    filter(Airline == "AM WEST")
+```
+
+```{r, echo = FALSE, results='hide'}
+arrivals_delays$delayed <-as.numeric(arrivals_delays$delayed)
+class(arrivals_delays$delayed)
+arrivals_delays$`on time` <- as.numeric(gsub(",","",arrivals_delays$`on time`))
+class(arrivals_delays$`on time`)
+```
+
+Conclusion
+==========
+
+The summary below and the corresponding line graphs show, AM West varies greatly on its delay and on time rate by city, specifically regarding San Francisco. **ALASKA** airlines, however, fluctuates less and is consistently on time more with less delays on all major cities compared to **AM WEST**.
+
+```{r, echo=FALSE}
+arrivals_delays %>%
+  group_by(Airline) %>%
+    summarise("Avg Delay" = mean(delayed),
+              "Avg Delay Rate" = mean(`Delay Rate`),
+              "On Time Avg" = mean(`on time`),
+              "On Time Avg Rate" = mean(`On Time Rate`)
+              )
+              
+```
+
+
+```{r, results= 'hold', out.width="50%", echo = FALSE}
+ggplot()+
+  geom_point(data = plot_no_filter,aes(x = City , y = `Delay Rate`, colour = Airline, group = 1))+
+  geom_line(data=plot_AK_del, aes(x = City , y = `Delay Rate`, group = 2, colour = Airline))+
+  geom_line(data=plot_AM_del, aes(x = City , y = `Delay Rate`, group = 2, colour = Airline))
+
+ggplot()+
+  geom_point(data = plot_no_filter,aes(x = City , y = `On Time Rate`, colour = Airline, group = 1))+
+  geom_line(data=plot_AK_del, aes(x = City , y = `On Time Rate`, group = 2, colour = Airline))+
+  geom_line(data=plot_AM_del, aes(x = City , y = `On Time Rate`, group = 2, colour = Airline))
+```
+  

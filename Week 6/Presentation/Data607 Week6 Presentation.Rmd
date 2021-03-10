@@ -1,0 +1,72 @@
+---
+title: "Data Science In Context"
+author: "Gabriel Campos"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = "hold")
+library(openintro)
+library(kableExtra)
+```
+
+Overview
+========
+
+Data storytelling is a fundamental part of Data Science. The processing and *sense making* of data, is what makes the overload of available today useful and what drives the demand in this field. Although many tools and resources are available for our disposal presently, I would like simply to elaborate on some of the data visualization tools available both internal and external from `R` and the data requirements in creating them. The charts created will be my own from previous work or examples found online.
+
+As usual, plots can be categorized as either exploratory or explanatory, however the focus here is not telling the story of each data set, rather simply a visual presentation of various visualizations, for them.
+
+ggplot
+=========
+
+## Summary
+
+ggplot2 is a suite for tools for creating plots. The data used in creating the below ggplot comes from the `tidyverse` package.Details and links regarding `ggplot` can be found below.
+
+(a) `ggplot2` website : [rdocumentation.org/packages/ggplot2/versions/3.3.3](https://www.rdocumentation.org/packages/ggplot2/versions/3.3.3) 
+(b) `ggplot` Github: **[github.com/cran/ggplot2](https://github.com/cran/ggplot2)**
+
+
+
+### Import Data
+
+```{r, warning=FALSE}
+library(ggplot2)
+```
+
+### Examples
+
+The data being used comes from [kaggle.com](https://www.kaggle.com/) dataset and .csv file ["Homicide Reports, 1980-2014](https://www.kaggle.com/murderaccountability/homicide-reports?select=database.csv)
+
+```{r, include=FALSE}
+file_path <- "D:/Bulk Data/Excel Files/database.csv"
+```
+
+
+```{r}
+my_data <- read.csv(file_path)
+```
+
+```{r}
+my_data %>%
+  head() %>%
+    kbl() %>%
+      kable_styling()
+
+```
+
+
+
