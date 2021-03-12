@@ -72,7 +72,7 @@ df_Child_Mortality <- read_csv(csv_Child_Mortality,
                                  col_names = FALSE,
                                  na = c("NA","?"),
                                  skip = 5,
-                                 n_max = 222,
+                                 n_max = 202,
                                  locale = readr::locale(encoding = "latin1"))
 ```
 Rows Range [^2]     `NA's` [^3]       Unicode-8[^4]
@@ -290,3 +290,24 @@ reactable(df_Child_Mortality,
           showPagination = TRUE,
           pageSizeOptions = c(5, 15,25,50,75, 100), defaultPageSize = 10)
 ```
+
+```{r}
+#m_score <- lm(`Under-5 mortality rate by sex  2018 (male)` ~ `Neonatal deaths as proportion of all under-5 deaths `, data= df_Child_Mortality)
+```
+
+```{r}
+#par(mar = c(3.5, 4, 1, 0.5), las = 1, mgp = c(2.5, 0.7, 0),
+#    cex.lab = 1.5, cex.axis = 1.5)
+#plot(`15-24 Year old Male Literacy Rate` ~ `Out of School Rate`, data= df_Child_Mortality,
+#     pch = 19, col = COL[1,2],
+#     xlab = "Under-5 mortality rate by sex  2018 (male)", ylab = "Neonatal deaths as proportion of all under-5 deaths", axes = FALSE)
+#axis(1)
+#axis(2, at = seq(20, 80, 20))
+#box()
+#abline(m_score, col = COL[2], lwd = 2)
+```
+
+```{r}
+#df_Child_Mortality$`Neonatal deaths as proportion of all under-5 deaths `
+```
+
