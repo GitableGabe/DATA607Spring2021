@@ -2,19 +2,27 @@
 title: "DATA607 Project 2"
 author: "Gabriel Campos"
 date: "`r format(Sys.Date(), '%B %d %Y')`"
-output: 
+output:
   html_document:
     includes:
       in_header: header.html
     css: ./lab.css
     highlight: pygments
-    theme: cerulean
+    theme: darkly
     toc: true
     toc_float: true
+  prettydoc::html_pretty:
+    theme: cayman
   pdf_document: default
 editor_options: 
   chunk_output_type: console
 ---
+
+
+<!--match.arg(theme, themes()) : 
+    'arg' should be one of "default", "cerulean", "journal","flatly",
+    "darkly", "readable", "spacelab", "united", "cosmo", "lumen", "paper", 
+    "sandstone", "simplex", "yeti"  -------->
 
 ```{r, echo=FALSE,warning=FALSE, results='hide', include=FALSE}
 library(tidyverse)
@@ -22,15 +30,16 @@ library(dplyr)
 library(reactable)
 library(kableExtra)
 library(stringr)
+library(magrittr)
 ```
 
 <!-- (https://rdrr.io/cran/reactable/man/reactable.html) -->
 
-# UNICEF Dataset{.tabset .tabset-pills}
+### UNICEF Dataset{.tabset .tabset-pills}
 
 
 
-## Assignment Requirements
+#### Assignment Requirements{.tabset}
 
 
 The goal of this assignment is to give you practice in preparing different datasets for downstream
@@ -43,43 +52,59 @@ analysis work.
       + Create a .CSV file (or optionally, a MySQL database!) that includes all of the information included in the dataset. 
       + *You’re encouraged to use a “wide” structure similar to how the information appears in the discussion item, so that you can practice tidying and transformations as described below.*
       + Read the information from your .CSV file into R, and use `tidyr` and `dplyr` as needed to tidy and transform your data. [Most of your grade will be based on this step!]
-      + Perform the analysis requested in the 
-      **discussion item.**[^1]
+      + Perform the analysis requested in the **discussion item.**  $\   \ $    *note$^1$*
       
       + Your code should be in an R Markdown file, posted to [rpubs.com](https://rpubs.com/] web page), and should include narrative descriptions of your data cleanup work, analysis, and conclusions.
-      
-      [^1]::![Post](Posted_Analysis.jpg){width=50%}
       
 2. Please include in your homework submission, for each of the three chosen datasets:
     + The URL to the .Rmd file in your GitHub repository, and
     + The URL for your [rpubs.com](https://rpubs.com/] web page)
 
-## Child Mortality
+#### Notes
 
-### Import Data
+1. Notes from the bottom of the .csv were excluded. Main data was selected between rows 5 to 222.
+![Post](Posted_Analysis.jpg){width=50%}
+2. `NA` and `?` were deliberately set to NA:
+3. encoding set to *latin1* to account for accents, in country naming convention
+4. `NA` columns are in odd number rows, select utilizing regex.
+5. Columns with a `%` indicator will be divided by 100 and `(thousands)` multiplied by 1000 accordingly
+6. `NA`, `-`, `x` and `?` were deliberately set to NA:
+7. `NA` columns are in odd number rows, select utilizing regex.
+8. `|` was added as a delimiter to later seperate gender.
+9. `cbind` was not used to bind to `df_Out_of_School` at this point, because the number of rows do not match.
+
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
+
+### Datasets{.tabset .tabset-pills}
+
+#### Child Mortality {.tabset}
+
+##### Import Data
 
 Data is imported from the .csv's `Child Mortality.csv` from my [github Project 2 folder](https://github.com/gcampos100/DATA607Spring2021/tree/main/Projects/Project%202) using the function `read_csv` from the `readr` package.
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 # path to csv's
 csv_Child_Mortality= 
 "https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%202/Child%20Mortality.csv"
+
+csv_Child_Mortality_bkp=
+  "D:/Docs/CUNY_SPS_Grad/DATA607/Course Docs/Projects/Project 2/Child Mortality.csv"
 ```
 
 
 ```{r, results='hide', message=FALSE}
-df_Child_Mortality <- read_csv(csv_Child_Mortality,
-                                 col_names = FALSE,
-                                 na = c("NA","?"),
-                                 skip = 5,
-                                 n_max = 202,
-                                 locale = readr::locale(encoding = "latin1"))
+df_Child_Mortality <-
+  read_csv(csv_Child_Mortality_bkp,
+                 col_names = FALSE,
+                 na = c("NA","?"),
+                         skip = 5,
+                       n_max = 202,
+                 locale = readr::locale(encoding = "latin1"))
 ```
-Rows Range [^2]     `NA's` [^3]       Unicode-8[^4]
+*note$^{2\&3}$*
 
-[^2]:Notes from the bottom of the .csv were excluded. Main data was selected between rows 5 to 222.:
-[^3]:`NA` and `?` were deliberately set to NA:
-[^4]:encoding set to *latin1* to account for accents, in country naming convention:
+
 
 **The Headers were not workable as a direct import from the csv, due to several columns having multi-headers as shown below**
 
@@ -117,8 +142,13 @@ Columns comprised entirely of `NA` values, are removed as well.
 
 ```{r}
 df_Child_Mortality <- 
-  df_Child_Mortality %>% select (everything(), -matches("[3579]$"),-matches("[123][13579]$"))
+  df_Child_Mortality %>% 
+  select (everything(),
+          -matches("[3579]$"),
+          -matches("[123][13579]$"))
 ```
+
+*notes$^{4}$*
 
 ```{r}
 colnames(df_Child_Mortality)<- colnames_Child_Mortality
@@ -142,11 +172,23 @@ kbl(sapply(df_Child_Mortality, class),col.names = "",caption = "Column Names and
   Manual column names were used in place of the **.csv multi-headers**. Names are basically a concatenation of the *Main Header* and *Sub Headers* whenever applicable.
   </div>
 
-### Manipulating Imported Data
+##### Manipulating Imported Data
 
 The existing data frame `df_Child_Mortality` is a strong representation of the data stored, **as is**, on the *.csv*. Many values in the data set are specified in the header as **(deaths per 1,000 lives births)** however.
 
 ```{r, echo=FALSE}
+options(reactable.theme = reactableTheme(
+  color = "hsl(233, 9%, 87%)",
+  backgroundColor = "hsl(233, 9%, 19%)",
+  borderColor = "hsl(233, 9%, 22%)",
+  stripedColor = "hsl(233, 12%, 22%)",
+  highlightColor = "hsl(233, 12%, 24%)",
+  inputStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  selectStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  pageButtonHoverStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  pageButtonActiveStyle = list(backgroundColor = "hsl(233, 9%, 28%)")
+))
+
 reactable(df_Child_Mortality %>%
             select(matches("\\(deaths per 1,000 live births|\\(deaths per 1,000 children aged 5\\)")),
           bordered = TRUE,
@@ -170,7 +212,8 @@ column_1000_index<-
 #Divide values by 1000
 df_Child_Mortality<-
   df_Child_Mortality %>%
-  mutate_at( vars( matches("\\(deaths per 1,000 live births)")) ,funs(./1000))
+  mutate_at( vars( matches("\\(deaths per 1,000 live births)")) ,
+             funs(./1000))
 
 ```
 
@@ -209,7 +252,8 @@ reactable(df_int_Child_Mortality %>%
 ```{r, echo=TRUE}
 #change type back to numeric after renaming columns converted it into `num`
 df_Child_Mortality[] <- 
-  lapply(df_Child_Mortality, function(x) {
+  lapply(df_Child_Mortality,
+         function(x) {
     if(is.factor(x)) round(as.numeric(as.character(x)),3) else x
 })
 ```
@@ -227,6 +271,7 @@ sapply(df_Child_Mortality, class)
 
 <br>
 The values inside the columns with `%` and `(thousands)` indicators will also be modified to reflect the exact numeric value.
+*note$^5$*
 
 ```{r, echo=FALSE}
 #located index of 1,000 columns for formatting with kableExtra:: and reactable::
@@ -251,21 +296,18 @@ head(df_int_Child_Mortality, n = 4) %>%
   </div>
 
 
-Note[^5]
-
-[^5]:Columns with a `%` indicator will be divided by 100 and `(thousands)` multiplied by 1000 accordingly:
-
-
 ```{r, message=FALSE, results='hide', warning=FALSE}
 #Divides % column values by 100
 df_Child_Mortality<-
   df_Child_Mortality %>%
-  mutate_at( vars( matches("\\%")) ,funs(./100))
+  mutate_at( vars( matches("\\%")) ,
+             funs(./100))
 
 #Multiplies "(thousands)" column values by 1000
 df_Child_Mortality<-
   df_Child_Mortality %>%
-  mutate_at( vars( matches("thousands")) ,funs(.*1000))
+  mutate_at( vars( matches("thousands")) ,
+             funs(.*1000))
 ```
 
 
@@ -291,23 +333,419 @@ reactable(df_Child_Mortality,
           pageSizeOptions = c(5, 15,25,50,75, 100), defaultPageSize = 10)
 ```
 
+##### Analysis
+
+I noted that the data set did not focus on Central or South America specifically. Mortality in these relationships are correlation just based on the label names. If a mortality rate in any aspect increases, so would the total mortality rate by country region etcetera. The analysis here is just to note the average by these two regions, not specifically accounted for in the original data set.\newline
+
+The calculation for the regions male & female mortality count is:\newline
+
+$\sum_{i=first}^{last}(Rate\times Annual)_i$\newline
+
+Where:\newline
+
+$first$ & $last$ refers to the country selected.\newline
+
+$Rate$ is the specified mortality rate *(male/female)*\newline
+
+\newline
+and the calculation for the Annual number of deaths is just $\sum_{Annual\ per\ country}$
+
+
 ```{r}
-#m_score <- lm(`Under-5 mortality rate by sex  2018 (male)` ~ `Neonatal deaths as proportion of all under-5 deaths `, data= df_Child_Mortality)
+df_CAmerica <-
+  c("Belize","Costa Rica","El Salvador",
+     "Guatemala","Honduras","Nicaragua","Panama")
+
+df_CAmerica <-
+  df_Child_Mortality %>%
+  filter(`Countries and areas` %in% c(df_CAmerica)) %>%
+    select(`Countries and areas`,
+           `Under-5 mortality rate by sex  2018 (male)`,
+           `Under-5 mortality rate by sex  2018 (female)`,
+           `Annual number of under-5 deaths  2018`)
+
+df_CAmerica<-
+  df_CAmerica %>%
+    rbind(c("Total Central America",
+          sum(df_CAmerica$`Under-5 mortality rate by sex  2018 (male)`*
+                df_CAmerica$`Annual number of under-5 deaths  2018`),
+          sum(df_CAmerica$`Under-5 mortality rate by sex  2018 (female)`*
+                df_CAmerica$`Annual number of under-5 deaths  2018`),
+          sum(df_CAmerica$`Annual number of under-5 deaths  2018`)))
+
 ```
 
 ```{r}
-#par(mar = c(3.5, 4, 1, 0.5), las = 1, mgp = c(2.5, 0.7, 0),
-#    cex.lab = 1.5, cex.axis = 1.5)
-#plot(`15-24 Year old Male Literacy Rate` ~ `Out of School Rate`, data= df_Child_Mortality,
-#     pch = 19, col = COL[1,2],
-#     xlab = "Under-5 mortality rate by sex  2018 (male)", ylab = "Neonatal deaths as proportion of all under-5 deaths", axes = FALSE)
-#axis(1)
-#axis(2, at = seq(20, 80, 20))
-#box()
-#abline(m_score, col = COL[2], lwd = 2)
+df_SAmerica <- 
+  c("Argentina","Bolivia","Brazil","Chile","Colombia",
+    "Ecuador","Guyana","Paraguay","Peru","Suriname",
+    "Uruguay","Venezuela")
+
+df_SAmerica<-
+  df_Child_Mortality %>%
+  filter(`Countries and areas` %in% c(df_SAmerica)) %>%
+    select(`Countries and areas`,
+           `Under-5 mortality rate by sex  2018 (male)`,
+           `Under-5 mortality rate by sex  2018 (female)`,
+           `Annual number of under-5 deaths  2018`)
+
+df_SAmerica<-
+  df_SAmerica %>%
+    rbind(c("Total South America",
+          sum(df_SAmerica$`Under-5 mortality rate by sex  2018 (male)`*
+                df_SAmerica$`Annual number of under-5 deaths  2018`),
+          sum(df_SAmerica$`Under-5 mortality rate by sex  2018 (female)`*
+                df_SAmerica$`Annual number of under-5 deaths  2018`),
+          sum(df_SAmerica$`Annual number of under-5 deaths  2018`)))
+```
+
+```{r, echo = FALSE}
+df_CAmerica %>%
+          kable("html",align = 'clc',col.names = c("Countries","Male","Female",
+                            "Annual"),
+              valign = 't',booktabs = TRUE) %>%
+                  column_spec(c(1:4),
+                        border_left = FALSE,
+                        border_right = FALSE) %>%
+                      kable_styling(full_width = F, position = "float_left")%>%
+                        add_header_above(c("Central America" = 4))
+                                      
+
+df_SAmerica %>%
+          kable(align = 'clc',col.names = c("Countries","Male","Female",
+                            "Annual"),valign = 't',booktabs = TRUE) %>%
+             column_spec(c(1:4),
+                    border_left = FALSE,
+                    border_right = FALSE)%>%
+                kable_styling(full_width = F, position = "float_right") %>%
+                  add_header_above(c("South America" = 4))
+```
+
+<body>
+  <div class="container">
+  <br>
+</div>
+
+The data was reformatted during the manipulation. Utilizing pipe and cbind, it is recreated with the necessary values being numeric. The combined data frame is `df_S_C_America`
+
+```{r, include=FALSE}
+df_CAmerica<-
+  cbind(df_CAmerica[,1],
+        df_CAmerica[1:8,2:4]%>%
+          mutate_all(as.numeric))
+
+df_SAmerica<-cbind(df_SAmerica[,1],
+                   df_SAmerica[1:11,2:4]%>%
+                     mutate_all(as.numeric))
+
+df_S_C_America<-
+  rbind(df_CAmerica,
+        df_SAmerica)
+```
+
+A visual representation of the total Annual death rate for those under 5 years old is highlighted in the plot below. Noteablly *Brazil* has a higher count then Central America as a whole. Brazil is a large country, however those numbers are still very high.
+
+```{r, echo=FALSE}
+ggplot(data = 
+         df_S_C_America,
+       aes(x =reorder(`Countries and areas`,`Annual number of under-5 deaths  2018`),
+           y=`Annual number of under-5 deaths  2018`,fill = `Countries and areas`))+
+      geom_col()+
+      coord_flip()+
+        labs(subtitle="by Country (Central & South America)", 
+                y="Annual Rates", 
+                x="Country | Region", 
+                title="Annual Death Rates Under-5 (2018)", 
+                caption = "Subject: DATA607 Project 2")
+```
+
+Unsurprisingly South America has a higher count for both genders, I would attribute this to the larger country size and high count of *Brazil* which resides in South America.
+
+```{r, echo=FALSE}
+ggplot(data = 
+         df_S_C_America%>%filter(str_detect(`Countries and areas`,"Total")),
+       aes(x =reorder(`Countries and areas`,`Under-5 mortality rate by sex  2018 (male)`),
+           y=`Under-5 mortality rate by sex  2018 (male)`,fill = `Countries and areas`))+
+      geom_col()+
+      coord_flip()+
+        labs(subtitle="by Region", 
+                y="Mortality Rates Male", 
+                x="Region", 
+                title="Under-5 Mortality Rates MALES (2018)", 
+                caption = "Subject: DATA607 Project 2")
+```
+
+```{r, echo=FALSE}
+ggplot(data = 
+         df_S_C_America%>%filter(str_detect(`Countries and areas`,"Total")),
+       aes(x =reorder(`Countries and areas`,`Under-5 mortality rate by sex  2018 (female)`),
+           y=`Under-5 mortality rate by sex  2018 (female)`,fill = `Countries and areas`))+
+      geom_col()+
+      coord_flip()+
+        labs(subtitle="by Region", 
+                y="Mortality Rates Female", 
+                x="Region", 
+                title="Under-5 Mortality Rates FEMALE (2018)", 
+                caption = "Subject: DATA607 Project 2")
+```
+
+
+\clearpage
+
+#### Education{.tabset}
+
+##### Import Data
+
+Data is imported from the .csv's `Education.csv` from my [github Project 2 folder](https://github.com/gcampos100/DATA607Spring2021/tree/main/Projects/Project%202) using the function `read_csv` from the `readr` package.
+
+```{r, echo=FALSE}
+# path to csv's
+csv_Child_Education= 
+"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%202/Education.csv"
+
+csv_Child_Education_bkp=
+  "D:/Docs/CUNY_SPS_Grad/DATA607/Course Docs/Projects/Project 2/Education.csv"
+```
+
+```{r, results='hide', message=FALSE}
+df_Education <- 
+  read_csv(csv_Child_Education_bkp,
+                col_names = FALSE,
+          na = c("NA","?","-","x"),
+          skip = 7,
+          n_max = 202,
+          locale = readr::locale(encoding = "latin1"))
+```
+
+*note$^{5}$*
+
+**The Headers were again not workable as a direct import from the csv, due to several columns having multi-headers, sum as many as 4 (as shown below). All data is between the time range 2010-2018**
+
+![](D:\Docs\CUNY_SPS_Grad\DATA607\Course Docs\Projects\Project 2\Header Names_ed.PNG)
+
+<body>
+  <div class="container">
+  <br>
+</div>
+
+```{r, echo=FALSE}
+colnames_Education <-
+  c("Countries and areas",
+          "Out of School rate - One Year before primary entry age | male",
+          "Out of School rate -One Year before primary entry age | female",
+          "Out of School rate -Primary Education | male",
+          "Out of School rate -Primary Education | female",
+          "Out of School rate -Lower secondary education | male",
+          "Out of School rate -Lower secondary education | female",
+          "Out of School rate -Upper secondary education | male",
+          "Out of School rate -Upper secondary education | female",
+          "Completion Rate - Primary education | male",
+          "Completion Rate - Primary education | female",
+          "Completion Rate - Lower secondary education | male",
+          "Completion Rate - Lower secondary education | female",
+          "Completion Rate - Upper secondary education | male",
+          "Completion Rate - Upper secondary education | female",
+          "Proportion of children in grade 2 or 3 achieving minimum proficiency level | reading",
+          "Proportion of children in grade 2 or 3 achieving minimum proficiency level | math",
+          "Proportion of children at the end of primary achieving minimum proficiency level | reading",
+          "Proportion of children at the end of primary achieving minimum proficiency level | math",
+          "Proportion of children at the end of lower secondary achieving minimum proficiency level | reading",
+          "Proportion of children at the end of lower secondary achieving minimum proficiency level | math",
+          "Youth (15–24 years) literacy rate (%) | male",
+          "Youth (15–24 years) literacy rate (%) | female")
+```
+
+Names were stored to the variable `colname_Education` and applied to the data frame.\newline
+Columns comprised entirely of `NA` values, are removed as well.
+
+```{r}
+df_Education <- 
+  df_Education %>% select (everything(), -matches("[3579]$"),-matches("[1234][13579]$"),-46)
+```
+
+```{r, message=FALSE, warning='hide', results= 'hold'}
+colnames(df_Education)<-
+  colnames_Education
+```
+
+```{r, echo=FALSE}
+kbl(sapply(df_Education, class),col.names = "",caption = "Column Names and Type") %>%
+  kable_styling(bootstrap_options = "striped",position = "right", full_width = F)
+```
+
+  Manual column names were used in place of the **.csv multi-headers**. Names are basically a concatenation of the *Main Header* and *Sub Headers* whenever applicable.
+
+*note$^{8}$*
+
+##### Manipulating Imported Data
+
+The `df_Out_of_School` data frame was created utilizing pipe (`%`), `select()`,`gather()`,`seperate()`, and `arrange()` functions in conjunction with `regex` to specify columns in the *Out of School* category.
+
+```{r, echo=TRUE}
+df_Out_of_School<-
+  df_Education %>%
+  select(1,matches("^Out.*male"))%>%
+    gather("Grade", "Out of School Rate", 2:9)%>%
+      separate("Grade", c("Grade Level", "Gender"),
+               sep = "\\| ") %>%
+        arrange(`Countries and areas`)
+      
+```
+
+Using the same method, the data `Completion rate` and `Youth (15–24 years) literacy rate (%)` is extracted and stored in `df_Completion` and `df_Literacy` data frames respectively.
+
+```{r, include=TRUE}
+df_Completion<-
+  df_Education %>%
+  select(1,matches("^(Completion)"))%>%
+    gather("Grade", "Completion Rate", 2:7)%>%
+      separate("Grade", c("Grade Level", "Gender"),
+               sep = "\\| ") %>%
+        arrange(`Countries and areas`)%>%
+          select(1,2:4)
+
+df_Literacy<-
+df_Education %>%
+  select(1,matches("Youth"))%>%
+    gather("Key", "Literacy Rate", 2:3)%>%
+      separate("Key", c("Column Name", "Gender"), sep = "\\| ") %>%
+        arrange(`Countries and areas`) %>%
+          select(1,2:4)
+```
+
+*note$^{9}$*
+
+A simpler naming convention is preferred for `Grade Level` in both `df_Completion` and `df_Out_of_School`. The below function resolves that for all rows.
+
+```{r, include=FALSE}
+names<-
+  colnames(df_Completion)
+```
+
+
+```{r}
+df_Completion<-
+ data.frame(lapply(df_Completion,
+                   function(x) {
+                  gsub("Completion Rate - ", "", x)
+              }))
+```
+
+```{r, include=FALSE}
+colnames(df_Completion)<-
+  names
+
+names<-
+  colnames(df_Out_of_School)
 ```
 
 ```{r}
-#df_Child_Mortality$`Neonatal deaths as proportion of all under-5 deaths `
+df_Out_of_School<-
+ data.frame(lapply(df_Out_of_School,
+                   function(x) {
+                  gsub("Out of School rate - |Out of School rate -|One | entry age", "", x)
+              }))
 ```
 
+```{r, include=FALSE}
+colnames(df_Out_of_School)<-
+  names
+```
+
+
+```{r, echo= FALSE, out.width="80%",results='hold'}
+head(df_Completion,n=5) %>%
+          kable("html",align = 'clc',col.names = c("Countries","Grade Levels","Gender",
+                            "Rate"),
+              valign = 't',booktabs = TRUE) %>%
+                      kable_styling(full_width = F, position = "float_left")%>%
+                        add_header_above(c("Out of School Rate" = 4))%>%
+                          column_spec(2, width = "10em")
+
+head(df_Out_of_School,n=5) %>%
+          kable("html",align = 'clc',col.names = c("Countries","Grade Levels","Gender",
+                            "Rate"),
+              valign = 't',booktabs = TRUE) %>%
+                      kable_styling(full_width = F, position = "float_right")%>%
+                        add_header_above(c("Completion Rate" = 4)) %>%
+                          column_spec(2, width = "10em")
+head(df_Literacy,n=5) %>%
+          kable("html",align = 'clc',col.names = c("Countries","Grade Levels","Gender",
+                            "Rate"),
+              valign = 't',booktabs = TRUE) %>%
+                      kable_styling(full_width = F, position = "float_left")%>%
+                        add_header_above(c("Completion Rate" = 4))
+```
+
+<body>
+  <div class="container">
+  <br>
+  </div>
+  
+
+In order to do an analysis for a specific set and to match the number of rows (*202*) in `df_Completion`, `df_Literacy` and `df_Out_of_School`, all `dataframes` are filter by `Upper secondary education` and `male`. They are stored to `dataframe` `df_Analysis`.
+
+```{r}
+df_Analysis<-
+  df_Out_of_School %>%
+      filter(str_detect(`Grade Level`, "Upper"),
+             `Gender`== "male")
+
+df_Analysis<-
+  cbind(df_Analysis,
+        df_Completion%>%
+      filter(str_detect(`Grade Level`, "Upper"),
+             `Gender`== "male")%>%
+        select(4))
+
+df_Analysis<-
+  cbind(df_Analysis,
+        df_Literacy%>%
+      filter(`Gender`== "male")%>%
+        select(4))
+```
+
+```{r, echo=FALSE}
+reactable(df_Analysis,
+          bordered = TRUE,
+          striped = TRUE,
+          highlight = TRUE,
+          filterable = TRUE,
+          showPageSizeOptions = TRUE,
+          showPagination = TRUE,
+          pageSizeOptions = c(5, 15,25,50,75, 100), defaultPageSize = 5)
+```
+
+##### Analysis
+
+```{r, message=FALSE,echo=FALSE}
+m_score <- 
+  lm(`Literacy Rate` ~ `Out of School Rate`,
+     data= na.omit(df_Analysis))
+
+ggplot(data = na.omit(df_Analysis),
+       aes(x = `Out of School Rate`,
+           y = `Literacy Rate`)) +
+geom_point() +
+stat_smooth(method = "lm",
+            se = FALSE)
+
+
+```
+
+
+```{r, message=FALSE, echo=FALSE}
+ggplot(na.omit(df_Analysis),
+       aes(x=`Out of School Rate`, y=`Literacy Rate`)) +
+  geom_smooth(method = "lm", color = "green")+
+  geom_point(aes(col=`Literacy Rate`))+
+  labs(subtitle=" Higher out of upper secondary school rates affect on male literacy rate?", 
+       y="Literacy Rate", 
+       x="Out of School Rate", 
+       title="Literacy Rates and Upper Secandary School rates (male)", 
+       caption = "Subject: DATA607 Project 2")
+```
+
+#### Nutrition {.tabset}
+
+##### Import Data
