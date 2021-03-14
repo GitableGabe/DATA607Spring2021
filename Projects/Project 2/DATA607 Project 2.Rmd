@@ -463,7 +463,8 @@ Unsurprisingly South America has a higher count for both genders, I would attrib
 
 ```{r, echo=FALSE}
 ggplot(data = 
-         df_S_C_America%>%filter(str_detect(`Countries and areas`,"Total")),
+         df_S_C_America%>%
+         filter(str_detect(`Countries and areas`,"Total")),
        aes(x =reorder(`Countries and areas`,`Under-5 mortality rate by sex  2018 (male)`),
            y=`Under-5 mortality rate by sex  2018 (male)`,fill = `Countries and areas`))+
       geom_col()+
@@ -477,9 +478,11 @@ ggplot(data =
 
 ```{r, echo=FALSE}
 ggplot(data = 
-         df_S_C_America%>%filter(str_detect(`Countries and areas`,"Total")),
+         df_S_C_America%>%
+         filter(str_detect(`Countries and areas`,"Total")),
        aes(x =reorder(`Countries and areas`,`Under-5 mortality rate by sex  2018 (female)`),
-           y=`Under-5 mortality rate by sex  2018 (female)`,fill = `Countries and areas`))+
+           y=`Under-5 mortality rate by sex  2018 (female)`,
+           fill = `Countries and areas`))+
       geom_col()+
       coord_flip()+
         labs(subtitle="by Region", 
@@ -487,6 +490,24 @@ ggplot(data =
                 x="Region", 
                 title="Under-5 Mortality Rates FEMALE (2018)", 
                 caption = "Subject: DATA607 Project 2")
+```
+
+```{r, include = FALSE}
+
+#Failed attempt at overlapping plot, will come back to this
+
+failed_attempt <- ggplot(NULL,
+            aes(`Under-5 mortality rate by sex  2018 (male)`,
+                `Under-5 mortality rate by sex  2018 (female)`)) + 
+  geom_col(aes(fill = `Under-5 mortality rate by sex  2018 (male)`),
+           data = df_S_C_America%>%
+             filter(str_detect(`Countries and areas`,"\\(male\\)")),
+           alpha = 0.5) +
+  geom_col(aes(fill = `Under-5 mortality rate by sex  2018 (female)`),
+           data = df_S_C_America%>%
+             filter(str_detect(`Countries and areas`,"Female")),
+           alpha = 0.5)
+failed_attempt
 ```
 
 
@@ -749,3 +770,34 @@ ggplot(na.omit(df_Analysis),
 #### Nutrition {.tabset}
 
 ##### Import Data
+
+```{r, echo=FALSE}
+# path to csv's
+csv_Nutrition_A= 
+"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%202/Nutrition%20A.csv"
+
+csv_Nutrition_A_bkp=
+  "D:/Docs/CUNY_SPS_Grad/DATA607/Course Docs/Projects/Project 2/Nutrition A.csv"
+```
+
+```{r, results='hide', message=FALSE}
+df_Nutrition <- 
+  read_csv(csv_Nutrition_A,
+                col_names = FALSE,
+          na = c("NA","?","–","x"," ","","<U+0096>"),
+          skip = 7,
+          n_max = 210,
+          locale = readr::locale(encoding = "windows-1252"),
+          )
+```
+
+```{r}
+str_view(df_Nutrition, "-", match = TRUE)
+```
+
+
+```{r}
+test<-as.data.frame(gsub("<U+0096>", "", df_Nutrition, fixed=TRUE))
+```
+
+.\x0096
