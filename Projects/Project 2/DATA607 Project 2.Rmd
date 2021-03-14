@@ -64,18 +64,231 @@ analysis work.
 
 1. Notes from the bottom of the .csv were excluded. Main data was selected between rows 5 to 222.
 ![Post](Posted_Analysis.jpg){width=50%}
-2. `NA` and `?` were deliberately set to NA:
+2. `NA` and `?` were deliberately set to NA
 3. encoding set to *latin1* to account for accents, in country naming convention
-4. `NA` columns are in odd number rows, select utilizing regex.
+4. `NA` columns are in odd number columns, select utilizing regex.
 5. Columns with a `%` indicator will be divided by 100 and `(thousands)` multiplied by 1000 accordingly
-6. `NA`, `-`, `x` and `?` were deliberately set to NA:
-7. `NA` columns are in odd number rows, select utilizing regex.
+6. `NA`, `-`, `x` and `?` were deliberately set to NA
+7. `NA` columns are in odd number columns, select utilizing regex and specifying exception column 46.
 8. `|` was added as a delimiter to later seperate gender.
 9. `cbind` was not used to bind to `df_Out_of_School` at this point, because the number of rows do not match.
+10. Original data was in the format `.xlsx` and converted to `.csv`. A formatting error with blank space `U+0096` occurred creating an issue upon import. `.csv` was opened with a notepad, then copied from `Nutrition A.csv` to `Nutrition A 1.csv` correcting the error and allowing the import to occur with the transformation of unnecessary characters into `NA`
+11. `NA`, `-`, `x`,` ` and `?` were deliberately set to NA
+12. `NA` columns are in odd number columns, select utilizing regex.
 
 <div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
 
 ### Datasets{.tabset .tabset-pills}
+
+#### Nutrition {.tabset}
+
+##### Import Data
+
+`UTF-8` Character error resolved before import. *note$^{10}$*
+Data is imported from the .csv `Nutrition A 1.csv` from my [github Project 2 folder](https://github.com/gcampos100/DATA607Spring2021/tree/main/Projects/Project%202) using the function `read_csv` from the `readr` package.
+
+```{r, echo=FALSE}
+# path to csv's
+csv_Nutrition_A= 
+"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%202/Nutrition%20A%201.csv"
+
+csv_Nutrition_A_bkp=
+  "D:/Docs/CUNY_SPS_Grad/DATA607/Course Docs/Projects/Project 2/Nutrition A 1.csv"
+```
+
+```{r, results='hide', message=FALSE}
+df_Nutrition <- 
+  read_csv(csv_Nutrition_A_bkp,
+                col_names = FALSE,
+          na = c("NA","?","–","x"," ","","<U+0096>"),
+          skip = 7,
+          n_max = 202,
+          locale = readr::locale(encoding = "windows-1252"),
+          )
+```
+
+*note$^{11}$*
+
+
+```{r}
+df_Nutrition <- 
+  df_Nutrition %>% 
+  select (everything(), -matches("[3579]$"),-matches("[12][13579]$"))
+```
+
+*note$^{12}$*
+
+```{r, echo=FALSE}
+colnames_df_Nutrition<-
+  c("Countries and areas",
+    "Weight at birth Low birthweight (%) 2015",
+    "Weight at birth Unweighed at birth (%) 2010–2018*",
+    "Early initiation of breastfeeding (%)",
+    "Exclusive breastfeeding (<6 months)(%)",
+    "Introduction to solid, semi-solid or soft foods (6–8 months) (%)",
+    "Continued breastfeeding (12–23 months) (%) All children",
+    "Continued breastfeeding (12–23 months) (%) Poorest 20%",
+    "Continued breastfeeding (12–23 months) (%) richest 20%",
+    "Minimum diet diversity (6–23 months) (%)",
+    "Minimum meal frequency (6–23 months) (%)",
+    "Minimum acceptable diet (6–23 months) (%)",
+    "Zero vegetable or fruit consumption (6–23 months) (%)")
+```
+
+**The Headers were not workable as a direct import from the csv, due to several columns having multi-headers as shown below**
+
+![](D:\Docs\CUNY_SPS_Grad\DATA607\Course Docs\Projects\Project 2\Header Names_nutrition.PNG)
+
+
+<body>
+  <div class="container">
+  <br>
+</div>
+
+```{r}
+colnames(df_Nutrition)<- colnames_df_Nutrition
+```
+
+```{r, echo=FALSE}
+kbl(sapply(df_Nutrition, class),col.names = "",caption = "Column Names and Type") %>%
+  kable_styling(bootstrap_options = "striped",position = "float_right", full_width = F)
+```
+
+<body>
+  <div class="container">
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  Manual column names were used in place of the **.csv multi-headers**. Names are basically a concatenation of the *Main Header* and *Sub Headers* whenever applicable.
+  </div>
+
+##### Manipulating Imported Data
+
+*note$^{1}$* \newline
+
+Paraphrased Instructions, based on post, not in the same order, are as follows:
+
+* Remove all `blank spaces` and `NA`'s from the data set. **(PARTIALLY COMPLETE ON IMPORT)**
+* Select for Analysis:
+    + Latin American Countries
+    + Low birth weight percentage
+    + Introduction to solid, semi-solid or soft foods (6-8 months) (%)
+    + Zero vegetable or fruit consumption (6-23 months) (%)
+* Rename columns
+* Pivot wide
+* Calculate stats
+
+According to [WorldPopulationReview.com](https://worldpopulationreview.com/country-rankings/latin-american-countries) Latin countries consist of.
+
+* Argentina
+* Bolivia
+* Brazil
+* Chile
+* Colombia
+* Costa Rica
+* Cuba
+* The Dominican Republic
+* Ecuador
+* El Salvador
+* Guatemala
+* Honduras
+* Mexico
+* Nicaragua
+* Panama
+* Paraguay
+* Peru
+* Puerto Rico
+* Uruguay
+* Venezuela
+
+Which is stored in the string `str_latin_countries` to filter with.
+
+```{r}
+str_latin_countries<-"Argentina|Bolivia|Brazil|Chile|
+Colombia|Costa Rica|Cuba|Dominican Republic|Ecuador|
+El Salvador|Guatemala|Honduras|Mexico|Nicaragua|Panama|
+Paraguay|Peru|Puerto Rico|Uruguay|Venezuela"
+```
+
+The required columns and rows are selected using pipe `%>%`, `filter()`, and `select()` functions.\newline
+
+Using `str_latin_countries`, the correct countries are specified.\newline
+
+Renaming takes place in accordance with instrucitons.\newline
+
+The resulting in the table is below.
+
+```{r}
+df_Nutrition_Analysis<-df_Nutrition%>%
+  filter(str_detect(`Countries and areas`, str_latin_countries))%>% 
+  select(1,2, 6,13) %>%
+  rename("Countries" = `Countries and areas`,
+         "Low Birth Weight" = `Weight at birth Low birthweight (%) 2015`,
+         "Intro to Solids"=`Introduction to solid, semi-solid or soft foods (6–8 months) (%)`,
+         "Zero (Vegetables|Fruits)"=`Zero vegetable or fruit consumption (6–23 months) (%)`)
+
+```
+
+```{r}
+kbl(df_Nutrition_Analysis)
+```
+
+<body>
+  <div class="container">
+  <br>
+</div>
+
+removing `NA` values reduces the `rows` from 16 to 7.
+
+```{r}
+df_Nutrition_Analysis<-na.omit(df_Nutrition_Analysis)
+```
+
+```{r, echo=FALSE}
+kbl(df_Nutrition_Analysis)
+```
+
+<body>
+  <div class="container">
+  <br>
+</div>
+
+##### Analysis
+
+
+Use of `pivot_longer` and `pivot_wider` did very little to enhance understanding of the data. Instead a linear model that shows a positive predictor in `Low Birth weight` from the `Zero (Vegetable | Fruit)` variable and a negative one with `Intro to Solids`.
+
+```{r}
+df_Nutrition_Analysis %>%
+pivot_wider(`Low Birth Weight`)
+df_Nutrition_Analysis %>%
+pivot_longer(`Zero (Vegetables|Fruits)`)
+```
+
+
+```{r,echo = FALSE, warning = FALSE,message = FALSE, fig.width=4, fig.height=5, results='hold'}
+
+ggplot(data = df_Nutrition_Analysis,
+       aes(x = `Low Birth Weight`,
+           y = `Zero (Vegetables|Fruits)`)) +
+geom_point() +
+stat_smooth(method = "lm",
+            se = FALSE)
+
+ggplot(data = df_Nutrition_Analysis,
+       aes(x = `Low Birth Weight`,
+           y = `Intro to Solids`)) +
+geom_point() +
+stat_smooth(method = "lm",
+            se = FALSE)
+
+
+```
 
 #### Child Mortality {.tabset}
 
@@ -639,7 +852,7 @@ df_Education %>%
 A simpler naming convention is preferred for `Grade Level` in both `df_Completion` and `df_Out_of_School`. The below function resolves that for all rows.
 
 ```{r, include=FALSE}
-names<-
+col_temp_names<-
   colnames(df_Completion)
 ```
 
@@ -654,9 +867,9 @@ df_Completion<-
 
 ```{r, include=FALSE}
 colnames(df_Completion)<-
-  names
+  col_temp_names
 
-names<-
+col_temp_names<-
   colnames(df_Out_of_School)
 ```
 
@@ -670,7 +883,7 @@ df_Out_of_School<-
 
 ```{r, include=FALSE}
 colnames(df_Out_of_School)<-
-  names
+  col_temp_names
 ```
 
 
@@ -739,7 +952,9 @@ reactable(df_Analysis,
 
 ##### Analysis
 
-```{r, message=FALSE,echo=FALSE}
+A basic analysis with a linear model shows, that as Out of school rate increases, so does the literacy of males in this data set.
+
+```{r, message=FALSE,echo=FALSE, include= FALSE}
 m_score <- 
   lm(`Literacy Rate` ~ `Out of School Rate`,
      data= na.omit(df_Analysis))
@@ -766,38 +981,3 @@ ggplot(na.omit(df_Analysis),
        title="Literacy Rates and Upper Secandary School rates (male)", 
        caption = "Subject: DATA607 Project 2")
 ```
-
-#### Nutrition {.tabset}
-
-##### Import Data
-
-```{r, echo=FALSE}
-# path to csv's
-csv_Nutrition_A= 
-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Projects/Project%202/Nutrition%20A.csv"
-
-csv_Nutrition_A_bkp=
-  "D:/Docs/CUNY_SPS_Grad/DATA607/Course Docs/Projects/Project 2/Nutrition A.csv"
-```
-
-```{r, results='hide', message=FALSE}
-df_Nutrition <- 
-  read_csv(csv_Nutrition_A,
-                col_names = FALSE,
-          na = c("NA","?","–","x"," ","","<U+0096>"),
-          skip = 7,
-          n_max = 210,
-          locale = readr::locale(encoding = "windows-1252"),
-          )
-```
-
-```{r}
-str_view(df_Nutrition, "-", match = TRUE)
-```
-
-
-```{r}
-test<-as.data.frame(gsub("<U+0096>", "", df_Nutrition, fixed=TRUE))
-```
-
-.\x0096
