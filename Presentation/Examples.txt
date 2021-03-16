@@ -1,0 +1,21 @@
+Sample Data Science in Context Presentations
+Posted on: Tuesday, February 16, 2021 1:25:43 PM EST
+
+Here are three examples of Data Science in Context presentations.
+The first one is an exemplary presentation from your class mate Joshua Hummell;
+the second and third are from previous DATA 607 students.
+
+Data Science in Context: Creating a Portfolio with Jekyll and Github pages,
+https://www.youtube.com/watch?v=3SeWCioo_hg 
+Asset Management: https://www.youtube.com/watch?v=8nLpkFH_N3E
+Soccer Analytics: https://www.youtube.com/watch?v=iSGuloxAwcA
+You can pick pretty much any Data Science-related topic.
+The Asset Management talk above would be an invaluable overview for a data scientist
+starting his or her first project for a commercial real estate firm. Picking a topic
+that you find challenging and explaining it effectively is a great way to deepen your
+learning--see the Feynman Technique: https://www.youtube.com/watch?v=tkm0TNFzIeg. 
+
+It’s important that you rehearse your presentation so that it can be done in about
+five minutes. Creating a video is a superb way to rehearse.
+
+Andy
