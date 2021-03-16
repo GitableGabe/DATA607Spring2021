@@ -98,12 +98,12 @@ csv_Nutrition_A_bkp=
 
 ```{r, results='hide', message=FALSE}
 df_Nutrition <- 
-  read_csv(csv_Nutrition_A_bkp,
+  read_csv(csv_Nutrition_A,
                 col_names = FALSE,
-          na = c("NA","?","–","x"," ","","<U+0096>"),
+          na = c("NA","?","–","x"," ",""),
           skip = 7,
           n_max = 202,
-          locale = readr::locale(encoding = "windows-1252"),
+          locale = readr::locale(encoding = "latin1"),
           )
 ```
 
@@ -308,7 +308,7 @@ csv_Child_Mortality_bkp=
 
 ```{r, results='hide', message=FALSE}
 df_Child_Mortality <-
-  read_csv(csv_Child_Mortality_bkp,
+  read_csv(csv_Child_Mortality,
                  col_names = FALSE,
                  na = c("NA","?"),
                          skip = 5,
@@ -743,7 +743,7 @@ csv_Child_Education_bkp=
 
 ```{r, results='hide', message=FALSE}
 df_Education <- 
-  read_csv(csv_Child_Education_bkp,
+  read_csv(csv_Child_Education,
                 col_names = FALSE,
           na = c("NA","?","-","x"),
           skip = 7,
