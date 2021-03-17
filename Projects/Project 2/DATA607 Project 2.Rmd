@@ -668,7 +668,7 @@ ggplot(data =
         labs(subtitle="by Country (Central & South America)", 
                 y="Annual Rates", 
                 x="Country | Region", 
-                title="Annual Death Rates Under-5 (2018)", 
+                title="Annual Death Counts Under-5 (2018)", 
                 caption = "Subject: DATA607 Project 2")
 ```
 
@@ -683,9 +683,9 @@ ggplot(data =
       geom_col()+
       coord_flip()+
         labs(subtitle="by Region", 
-                y="Mortality Rates Male", 
+                y="Mortality Counts Male", 
                 x="Region", 
-                title="Under-5 Mortality Rates MALES (2018)", 
+                title="Under-5 Mortality Counts MALES (2018)", 
                 caption = "Subject: DATA607 Project 2")
 ```
 
@@ -699,9 +699,9 @@ ggplot(data =
       geom_col()+
       coord_flip()+
         labs(subtitle="by Region", 
-                y="Mortality Rates Female", 
+                y="Mortality Counts Female", 
                 x="Region", 
-                title="Under-5 Mortality Rates FEMALE (2018)", 
+                title="Under-5 Mortality Counts FEMALE (2018)", 
                 caption = "Subject: DATA607 Project 2")
 ```
 
