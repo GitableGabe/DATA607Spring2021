@@ -1,13 +1,13 @@
 {"Favorite_Books":[
 			{
 					"BookName"	:"Opeksha",
-					"Author"	:["Humayun Ahmed"],
-					"Attributes":"Plot","Charecter Devlopment"
+					"Author"	:"Humayun Ahmed",
+					"Attributes":["Plot","Charecter Devlopment"]
 			},
 			{
 					"BookName"	:"Separation Anxiety",
-					"Author"	:["Laura Zigman"],
-					"Attributes":"Relatable Charecter","Plot"
+					"Author"	:"Laura Zigman",
+					"Attributes":["Relatable Charecter","Plot"]
 			},
 			{
 					"BookName"	:"Freakonomics",
