@@ -18,7 +18,7 @@ editor_options:
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE, results = "hold")
-library(tidyverse)
+library(rvest)
 ```
 
 Overview
@@ -36,6 +36,31 @@ Overview
 
 Import Data
 ===========
+
+[HTML code editor](https://htmlcodeeditor.com/)
+
+```{r, include=FALSE}
+url_HTML  <-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%207/test.html"
+urlXML    <-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%207/test.xml"
+url_JSON  <-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%207/test.json"
+```
+
+```{r}
+html_test <-read_html(url_HTML, header = TRUE)
+xml_test  <-xml2::read_xml(urlXML)
+json_test <-jsonlite::fromJSON(url_JSON)
+```
+
+
+```{r}
+xml_test
+```
+
+
+```{r}
+df_html<-as.data.frame(html_table(html_test))
+```
+
 
 
 
