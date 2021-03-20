@@ -1,28 +1,25 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
-<rbooklist>
-  <book id="1">
-    <title>Advanced R</title>
-    <year>2015</year>
-    <authors>Hadley Wickham</authors>
-    <publisher>CRC Press</publisher>
-    <numpages>476</numpages>
-    <goodreadsrank>4.7</goodreadsrank>
-  </book>
-  <book id="2">
-    <title>R in Action</title>
-    <year>2011</year>
-    <authors>Robert I. Kabacoff</authors>
-    <publisher>Manning Publications</publisher>
-    <numpages>472</numpages>
-    <goodreadsrank>4.1</goodreadsrank>
-  </book>
-  <book id="3">
-    <title>Automated Data Collection in R</title>
-    <year>2015</year>
-    <authors>Simon Munzert, Christian Rubba, Peter Meissner, Dominic Nyhuis</authors>
-    <publisher>Wiley Press</publisher>
-    <numpages>480</numpages>
-    <goodreadsrank>4.0</goodreadsrank>
-  </book>
-</rbooklist>
+<catalog>
+	<book id="001">
+		<title>Les Misérables</title>
+		<author>Victor Hugo</author>		
+		<year_published>1862</year_published>
+		<publisher>A. Lacriox, Verboeckhoven and Cie.</publisher>
+		<price>8.49</price>
+	</book>
+	<book id="002">
+		<title>Got Fight?</title>
+		<author>Forrest Griffin</author>		
+		<year_published>2010</year_published>
+		<publisher>William Morrow Paperbacks</publisher>
+		<price>16.99</price>
+	</book>
+	<book id="003">
+		<title>The BFG</title>
+		<author>Roald Dahl, Quentin Blake</author>		
+		<year_published>1982</year_published>
+		<publisher>Puffin Books</publisher>
+		<price>7.99</price>
+	</book>
+</catalog>
