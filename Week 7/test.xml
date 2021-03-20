@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <catalog>
 	<book id="001">
-		<title>Les Miserables</title>
+		<title>Les Misérables</title>
 		<author>Victor Hugo</author>		
 		<year_published>1862</year_published>
-		<publisher>A. Lacriox, Verboeckhoven &#x26; Cie.</publisher>
+		<publisher>A. Lacriox, Verboeckhoven &amp Cie.</publisher>
 		<price>8.49</price>
 	</book>
 	<book id="002">
