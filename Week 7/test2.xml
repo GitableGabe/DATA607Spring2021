@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<catalog>
+	<book id="001">
+		<title>Les Misérables</title>
+		<author>Victor Hugo</author>		
+		<year_published>1862</year_published>
+		<publisher>A. Lacriox, Verboeckhoven and Cie.</publisher>
+		<price>8.49</price>
+	</book>
+	<book id="002">
+		<title>Got Fight?</title>
+		<author>Forrest Griffin</author>		
+		<year_published>2010</year_published>
+		<publisher>William Morrow Paperbacks</publisher>
+		<price>16.99</price>
+	</book>
+	<book id="003">
+		<title>The BFG</title>
+		<author>Roald Dahl, Quentin Blake</author>		
+		<year_published>1982</year_published>
+		<publisher>Puffin Books</publisher>
+		<price>7.99</price>
+	</book>
+</catalog>
