@@ -1,17 +1,23 @@
 {"Favorite_Books":[
 			{
-					"BookName"	:"Opeksha",
-					"Author"	:"Humayun Ahmed",
-					"Attributes":["Plot","Charecter Devlopment"]
+					"BookName"	:"Les Misérables",
+					"Author"	:"Victor Hugo",
+					"YearPublished":"1862",
+                    "Publisher": ["A. Lacriox, Verboeckhoven and Cie"],
+                    "Price": "8.49"
 			},
 			{
-					"BookName"	:"Separation Anxiety",
-					"Author"	:"Laura Zigman",
-					"Attributes":["Relatable Charecter","Plot"]
+					"BookName"	:"Les Misérables",
+					"Author"	:"Victor Hugo",
+					"YearPublished":"1862",
+                    "Publisher": ["A. Lacriox, Verboeckhoven and Cie"],
+                    "Price": "8.49"
 			},
 			{
-					"BookName"	:"Freakonomics",
-					"Author"	:["Steven Levitt", "Stephen J. Dubner"],
-					"Attributes":"Gripping Factor"
+					"BookName"	:"Les Misérables",
+					"Author"	:"Victor Hugo",
+					"YearPublished":"1862",
+                    "Publisher": ["A. Lacriox, Verboeckhoven and Cie"],
+                    "Price": "8.49"
 			}]
 }

@@ -19,20 +19,25 @@ editor_options:
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE, results = "hold")
 library(rvest)
+library(dplyr)
+library(XML)
+library(RCurl)
+library(janitor)
+library(stringr)
 ```
 
 Overview
 ========
 
-1. Pick three of your favorite books on one of your favorite subjects. 
-    +At least one of the books should have more than one author. 
-2. For each book, include the title, authors, and two or three other attributes that you find interesting.
-3. Take the information that you’ve selected about these three books, and separately create three files which store the book’s information in HTML (using an html table), XML, and JSON formats (e.g. “books.html”, “books.xml”, and “books.json”).
-4. To help you better understand the different file structures, I’d prefer that you create each of these files “by hand” unless you’re already very comfortable with the file formats.
-5. Write R code, using your packages of choice, to load the information from each of the three sources into separate R data frames. Are the three data frames identical?
-6. Your deliverable is the three source files and the R code.
-    + If you can, package your assignment solution up into an .Rmd file and publish to rpubs.com. 
-      * [This will also require finding a way to make your three text files accessible from the web].
+1. Pick **three** of your favorite books on **one** of your favorite subjects. 
+    + **At least one** of the books should have **more than one author**. 
+2. For **each book**, include the **title**, **authors**, and **two or three** other **attributes** that you find interesting.
+3. Take the information that you’ve selected about these three books, and separately **create three files** which store the book’s information in **HTML** (using an **html table**), **XML**, and **JSON formats** (**e.g.** $“books.html”, “books.xml”, and “books.json”$).
+4. To help you better understand the different file structures, I’d prefer that you **create each of these files “by hand”** unless you’re already very comfortable with the file formats.
+5. Write `R` code, using **your** `packages` of choice, to **load the information** from each of the **three sources** into separate `R` `data frames`. 
+    + **Are the three data frames identical?**
+6. Your **deliverable** is the **three source files** and the `R` **code**.
+    + If you can, `package` your assignment solution up into an `.Rmd` file and **publish** to $rpubs.com$.       * [This will also require finding a way to make your three text files accessible from the web].
 
 Import Data
 ===========
@@ -41,27 +46,36 @@ Import Data
 
 ```{r, include=FALSE}
 url_HTML  <-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%207/test.html"
-urlXML    <-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%207/test.xml"
+urlXML    <-httr::GET("https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%207/test.xml")
 url_JSON  <-"https://raw.githubusercontent.com/gcampos100/DATA607Spring2021/main/Week%207/test.json"
 ```
 
 ```{r}
-html_test <-read_html(url_HTML, header = TRUE)
-xml_test  <-xml2::read_xml(urlXML)
+import_html <-read_html(url_HTML, header = TRUE)
+import_xml <- xmlParse(urlXML)
 json_test <-jsonlite::fromJSON(url_JSON)
 ```
 
 
+[XMLInternalDocument](https://www.rdocumentation.org/packages/XML/versions/3.99-0.5/topics/XMLInternalDocument-class)
+
+xml [xml_document](https://www.rdocumentation.org/packages/xml2/versions/1.3.2/topics/xml_document-class) class
+
+Convert to Data Frame
+=====================
+
 ```{r}
-xml_test
+df_html<-
+  as.data.frame(html_table(import_html)) %>%
+    row_to_names(1)
+
+df_xml<-xmlToDataFrame(import_xml)
+colnames(df_xml)<- str_to_title(colnames(df_xml))
 ```
 
-
 ```{r}
-df_html<-as.data.frame(html_table(html_test))
+
 ```
-
-
 
 
 Cleanup
