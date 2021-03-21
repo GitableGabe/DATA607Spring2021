@@ -16,10 +16,10 @@
 		<price>43.99</price>
 	</book>
 	<book id="003">
-		<title>The BFG</title>
-		<author>Roald Dahl, Quentin Blake</author>		
-		<year_published>1982</year_published>
-		<publisher>Puffin Books</publisher>
-		<price>7.99</price>
+		<title>A First Course in Bayesian Statistical Methods 1st Edition</title>
+		<author>Peter D. Hoff</author>		
+		<year_published>2010</year_published>
+		<publisher>Springer Verlag</publisher>
+		<price>46.60</price>
 	</book>
 </catalog>

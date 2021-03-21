@@ -24,6 +24,7 @@ library(XML)
 library(RCurl)
 library(janitor)
 library(stringr)
+library(kableExtra)
 ```
 
 Overview
@@ -80,14 +81,30 @@ Convert to Data Frame
 ```{r}
 df_html<-
   as.data.frame(html_table(import_html)) %>%
-    row_to_names(1)
+    row_to_names(1) %>%
+      tibble::remove_rownames()
 
 df_xml<-xmlToDataFrame(import_xml)
-colnames(df_xml)<- str_to_title(colnames(df_xml))
+colnames(df_xml)<-  str_to_title(colnames(df_xml))
+
 
 df_json <- do.call("rbind", lapply(import_json, data.frame))
   rownames(df_json)<-NULL
 ```
+
+
+```{r, echo= FALSE}
+df_html %>%
+  kbl()   %>%
+    add_header_above(c("HTML" = 5))
+df_xml %>%
+  kbl()  %>%
+    add_header_above(c("XML" = 5))
+df_json %>%
+  kbl() %>%
+    add_header_above(c("JSON" = 5))
+```
+
 
 Conclusion
 ==========

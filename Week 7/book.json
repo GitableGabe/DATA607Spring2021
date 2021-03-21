@@ -14,10 +14,10 @@
                     "Price": "43.99"
 			},
 			{
-					"BookName"	:"Les Misérables",
-					"Author"	:"Victor Hugo",
-					"YearPublished":"1862",
-                    "Publisher": ["A. Lacriox, Verboeckhoven and Cie"],
-                    "Price": "8.49"
+					"BookName"	:"A First Course in Bayesian Statistical Methods 1st Edition",
+					"Author"	:"Peter D. Hoff",
+					"YearPublished":"2010",
+                    "Publisher": "Springer Verlag",
+                    "Price": "46.60"
 			}]
 }
