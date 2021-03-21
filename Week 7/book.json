@@ -1,17 +1,17 @@
 {"Favorite_Books":[
 			{
-					"BookName"	:"Les Misérables",
-					"Author"	:"Victor Hugo",
-					"YearPublished":"1862",
-                    "Publisher": ["A. Lacriox, Verboeckhoven and Cie"],
-                    "Price": "8.49"
+					"BookName"	:"Bayesian Theory 1st Edition",
+					"Author"	:["Jose M. Bernardo, Adrian F. M. Smith"],
+					"YearPublished":"2000",
+                    "Publisher": "Wiley Series in Probability and Statistics",
+                    "Price": "98.03"
 			},
 			{
-					"BookName"	:"Les Misérables",
-					"Author"	:"Victor Hugo",
-					"YearPublished":"1862",
-                    "Publisher": ["A. Lacriox, Verboeckhoven and Cie"],
-                    "Price": "8.49"
+					"BookName"	:"The Bayesian Choice: From Decision-Theoretic Foundations to Computational Implementation 2nd Edition",
+					"Author"	:"Christian P. Robert",
+					"YearPublished":"2007",
+                    "Publisher": "Springer Verlag",
+                    "Price": "43.99"
 			},
 			{
 					"BookName"	:"Les Misérables",

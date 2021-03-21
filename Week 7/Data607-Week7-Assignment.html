@@ -1608,24 +1608,52 @@ div.tocify {
 </div>
 <div id="import-data" class="section level1">
 <h1>Import Data</h1>
-<p><a href="https://htmlcodeeditor.com/">HTML code editor</a></p>
+<p>Files <code>book.html</code>, <code>book.xml</code> &amp; <code>book.json</code> are located in <a href="https://github.com/gcampos100/DATA607Spring2021/tree/main/Week%207">Week 7 Folder</a> of my <a href="https://github.com/gcampos100/DATA607Spring2021">GitHub Repository</a></p>
+<p>All url’s were stored to there respective character variable:</p>
+<ul>
+<li>import_HTML</li>
+<li>import_XML</li>
+<li>import_JSON</li>
+</ul>
+<p>Importing involve the following</p>
+<ul>
+<li><strong>HTML:</strong> <code>read_html()</code> from the <code>rvest</code> library, and is imported as class <a href="https://www.rdocumentation.org/packages/XML/versions/3.99-0.5/topics/XMLInternalDocument-class">XMLInternalDocument</a></li>
+<li><strong>XML:</strong> <code>xmlParse()</code> from the <code>XML</code> library and is imported as class <a href="https://www.rdocumentation.org/packages/xml2/versions/1.3.2/topics/xml_document-class">xml_document</a></li>
+<li><strong>JSON:</strong> <code>fromJSON()</code> from the <code>jsonlite</code> library imported as a <a href="https://www.tutorialspoint.com/r/r_lists.htm">list</a></li>
+</ul>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>import_html &lt;-<span class="kw">read_html</span>(url_HTML, <span class="dt">header =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2"></a>import_xml &lt;-<span class="st"> </span><span class="kw">xmlParse</span>(urlXML)</span>
-<span id="cb1-3"><a href="#cb1-3"></a>json_test &lt;-jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url_JSON)</span></code></pre></div>
-<p><a href="https://www.rdocumentation.org/packages/XML/versions/3.99-0.5/topics/XMLInternalDocument-class">XMLInternalDocument</a></p>
-<p>xml <a href="https://www.rdocumentation.org/packages/xml2/versions/1.3.2/topics/xml_document-class">xml_document</a> class</p>
+<span id="cb1-3"><a href="#cb1-3"></a>import_json &lt;-jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url_JSON)</span></code></pre></div>
 </div>
 <div id="convert-to-data-frame" class="section level1">
 <h1>Convert to Data Frame</h1>
+<ul>
+<li><strong>HTML:</strong> converted to first with <code>html_table()</code> function, the resulting <a href="https://blog.rstudio.com/2016/03/24/tibble-1-0-0/#:~:text=There%20are%20two%20main%20differences,to%20work%20with%20large%20data.">tibble</a> is then converted to a traditional <code>data.frame</code> with the function <code>as.data.frame()</code>. <strong>NOTE</strong><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a><span class="math inline">\(^,\)</span> <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></li>
+<li><strong>XML:</strong> <code>xmlToDataFrame</code> function from <code>XML</code> package.<strong>NOTE</strong><a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></li>
+<li><strong>JSON</strong> <code>do.call</code> <strong>base</strong> function is used to utilize a <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/do.call">function call</a> in this operation <code>rbind()</code> on list. <code>lapply()</code> is used for performing functions on a list, in this case formatting the list into rows and columns. The combined methods create the desired <code>data.frame</code></li>
+</ul>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>df_html&lt;-</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="st">  </span><span class="kw">as.data.frame</span>(<span class="kw">html_table</span>(import_html)) <span class="op">%&gt;%</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="st">    </span><span class="kw">row_to_names</span>(<span class="dv">1</span>)</span>
 <span id="cb2-4"><a href="#cb2-4"></a></span>
 <span id="cb2-5"><a href="#cb2-5"></a>df_xml&lt;-<span class="kw">xmlToDataFrame</span>(import_xml)</span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="kw">colnames</span>(df_xml)&lt;-<span class="st"> </span><span class="kw">str_to_title</span>(<span class="kw">colnames</span>(df_xml))</span></code></pre></div>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="kw">colnames</span>(df_xml)&lt;-<span class="st"> </span><span class="kw">str_to_title</span>(<span class="kw">colnames</span>(df_xml))</span>
+<span id="cb2-7"><a href="#cb2-7"></a></span>
+<span id="cb2-8"><a href="#cb2-8"></a>df_json &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="kw">lapply</span>(import_json, data.frame))</span>
+<span id="cb2-9"><a href="#cb2-9"></a>  <span class="kw">rownames</span>(df_json)&lt;-<span class="ot">NULL</span></span></code></pre></div>
 </div>
-<div id="cleanup" class="section level1">
-<h1>Cleanup</h1>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p><strong>Are the three data frames identical?</strong></p>
+<p>No, they are not. The column names are imported according the the naming conventions of where they were imported (although can be excluded or altered on import). Each requires their own library to import and the class types of each on import is distinct. As such, the approach to changing the data into a data.frame are also different.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><em>when examined with <code>class()</code> function, the result of <code>html_table(import_html)</code> is class type <code>list</code>.</em>:<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p><em><code>row_to_names</code> function used to replace column names with first row values.</em>:<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p><em><code>str_to_title</code> used to capitalized the first letter of each column word.</em>:<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 
 

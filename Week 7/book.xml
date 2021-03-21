@@ -2,18 +2,18 @@
 
 <catalog>
 	<book id="001">
-		<title>Les Misérables</title>
-		<author>Victor Hugo</author>		
-		<year_published>1862</year_published>
-		<publisher>A. Lacriox, Verboeckhoven and Cie.</publisher>
-		<price>8.49</price>
+		<title>Bayesian Theory 1st Edition</title>
+		<author>Jose M. Bernardo, Adrian F. M. Smith</author>		
+		<year_published>2000</year_published>
+		<publisher>Wiley Series in Probability and Statistics</publisher>
+		<price>98.03</price>
 	</book>
 	<book id="002">
-		<title>Got Fight?</title>
-		<author>Forrest Griffin</author>		
-		<year_published>2010</year_published>
-		<publisher>William Morrow Paperbacks</publisher>
-		<price>16.99</price>
+		<title>The Bayesian Choice: From Decision-Theoretic Foundations to Computational Implementation 2nd Edition</title>
+		<author>Christian P. Robert</author>		
+		<year_published>2007</year_published>
+		<publisher>Springer Verlag</publisher>
+		<price>43.99</price>
 	</book>
 	<book id="003">
 		<title>The BFG</title>
