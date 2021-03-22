@@ -97,14 +97,19 @@ df_json <- do.call("rbind", lapply(import_json, data.frame))
 df_html %>%
   kbl()   %>%
     add_header_above(c("HTML" = 5))
+```
+
+```{r, echo=FALSE}
 df_xml %>%
   kbl()  %>%
     add_header_above(c("XML" = 5))
+```
+
+```{r, echo=FALSE}
 df_json %>%
   kbl() %>%
     add_header_above(c("JSON" = 5))
 ```
-
 
 Conclusion
 ==========
