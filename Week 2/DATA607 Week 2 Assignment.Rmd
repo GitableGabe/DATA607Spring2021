@@ -31,8 +31,6 @@ library(tidyverse)
 ```
 
 
-
-
 Assignment Requirements
 =======================
 **DATA607 Week 2 assignment:** 
