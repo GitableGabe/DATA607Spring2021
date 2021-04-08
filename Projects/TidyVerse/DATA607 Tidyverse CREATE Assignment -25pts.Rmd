@@ -140,7 +140,7 @@ head(evals)
 
 ### Step 3: Prepare Data
 
-Dataframe `manipulated` data is created using specifically columns `prof_id` and `score` from `evals` data set. Data is then condensed using `group_by()` function and a new column `no_rows` is added to the dataframe as shown below
+Dataframe `manipulated_data` is created using specifically columns `prof_id` and `score` from `evals` data set. Data is then condensed using `group_by()` function and a new column `no_rows` is added to the dataframe as shown below
 
 
 ```{r, messages = FALSE}
@@ -221,4 +221,9 @@ ggplot(data = manipulated_data, aes(x=Score, y=no_rows,fill=no_rows)) +
 
 The resulting snippet allows for an easy copy & paste with full graphics available
 
-![Giihub Load Example](github_load_ex.png)
+![Github Load Example](github_load_ex.png)
+
+Conclusion
+===========
+
+The understanding the use of ggplot is almost a requirement in my opinion, as the complex plots are best formed utilizing this function. Reprex is also invaluable, as a way to clearly display snippets of code to others while not having to share entire file. The snippets is best when posting on public forums, but also very useful when working within a team, and just needing advice for a specific section.
