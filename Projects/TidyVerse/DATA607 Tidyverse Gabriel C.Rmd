@@ -1,0 +1,229 @@
+---
+title: "Tidyverse CREATE Assignment (25 points)"
+author: "Gabriel Campos"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+library(tidyverse)
+```
+
+
+
+
+Assignment Requirements
+=======================
+**Tidyverse CREATE Assignment (25 points) **
+ 
++ Clone the provided repository (1 point) 🗸
++ Write a vignette using one TidyVerse package (15 points) 🗸 
++ Write a vignette using more than one TidyVerse packages (+ 2 points) 🗸 
++ Make a pull request on the shared repository (1 point) 
++ Update the README.md file with your example (2 points) 
++ Submit your GitHub handle name & link to Peergrade (1 point) 
++ Grade your 3 peers and provide the feedback in Peergrade (2 points) 
++ Submit the best peer link & your link to Blackboard (1 point) 
+
+
+Overview
+========
+The `tidyverse package` is an open source collection of packages with very applicable and useful tools for Data Science. Installing tidyverse like any other package can be done with the `install.packages()` function. The packages I will focus on is `reprex` and `ggplot` function for my assignment. Requirements to run code is `openintro package`
+
+Load Package
+=========
+
+Loading the library after an installation can be done using the command below
+
+```{r}
+library(tidyverse)
+```
+
+```{r, include=FALSE}
+Package_Details<-as.data.frame(tidyverse_packages(include_self = FALSE))
+colnames(Package_Details)<-c("Package")
+```
+
+
+```{r, echo=FALSE}
+Package_Details$Description<-c("[For summarizing statistic models using tiny bubbles](https://www.tidyverse.org/blog/2020/07/broom-0-7-0/)",
+                               "[Suite of tools for Command Line Interface](https://cran.r-project.org/web/packages/cli/index.html)",
+            "[Colored terminal output](https://rdrr.io/cran/crayon/)",
+            "[dplyr's backend database](https://dbplyr.tidyverse.org/)",
+            "[Actions involving Data Manipulation](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8)",
+            "[Suite of tools for factors](https://forcats.tidyverse.org/)",
+            "[Suite of tools for creating plots](https://ggplot2.tidyverse.org/)",
+            "[enables R to read and write various data formats](https://www.tidyverse.org/blog/2020/06/haven-2-3-0/)",
+            "[Used for storing durations or times](https://hms.tidyverse.org/)",
+            "[Wrapper for curl package](https://www.tidyverse.org/blog/2018/12/httr-1-4-0/)",
+            "[JSON Parser and Generator for R](https://robotwealth.com/how-to-wrangle-json-data-in-r-with-jsonlite-purr-and-dplyr/)",
+            "[Intuitive date-time data tools](https://lubridate.tidyverse.org/)",
+            "[Operators for code readability](https://magrittr.tidyverse.org/)",
+            "[Modeling pipeline functions](https://modelr.tidyverse.org/)",
+            "[Column formatting tools](https://www.rdocumentation.org/packages/pillar/versions/1.4.7)",
+            "[Allows for mapping functions to data](https://purrr.tidyverse.org/)",
+            "[For reading rectangular data](https://www.rdocumentation.org/packages/readr/versions/1.3.1)",
+            "[For reading data quickly from excel files](https://readxl.tidyverse.org/)",
+            "[Wrapper for creating snippets to post on websites and messaging apps](https://www.rdocumentation.org/packages/reprex/versions/1.0.0)",
+            "[For core language features of tidyverse](https://www.rdocumentation.org/packages/rlang/versions/0.2.2)",
+            "[For conditional access to RStudios API from CRAN](https://rstudio.github.io/rstudioapi/)",
+            "[Wrapper for scraping of information off of webpages](https://www.rdocumentation.org/packages/rvest/versions/0.3.6)",
+            "[Tools for data cleaing and preparation](https://stringr.tidyverse.org/)",
+            "[For dataframe creation](https://www.rdocumentation.org/packages/tibble/versions/3.0.6)",
+            "[To 'tidy up' or simplify data](https://tidyr.tidyverse.org/)",
+            "[To enhance work with HTML and XML through R](https://xml2.r-lib.org/)"
+            )
+```
+
+```{r,echo=FALSE}
+Package_Details %>%
+  kableExtra::kbl() %>%
+  kableExtra::kable_material_dark()%>%
+  kableExtra::footnote(general = "TIDYVERSE PACKAGES", general_title =  "A-1")
+```
+
+
+Reprex
+------
+As explained in `Table A-1` Reprex is a *Wrapper for creating snippets to post on websites and messaging apps. It's source information and details can be found below.
+
+## Reprex Source Information:
+
+(a) Website for `Reprex Package`: **[reprex.tidyverse.org](https://reprex.tidyverse.org/)**
+(c) `Reprex` Github: **[github.com/tidyverse/reprex](https://github.com/tidyverse/reprex)**
+(b) Good Tutorial for `Reprex`: **[How to use reprex](https://reprex.tidyverse.org/articles/articles/learn-reprex.html)**, **[vignettes/articles/learn-reprex.Rmd](https://github.com/tidyverse/reprex/blob/master/vignettes/articles/learn-reprex.Rmd)** \newline
+
+\clearpage
+
+## ggplot2
+
+As explained in `Table A-1` ggplot2 is a suite for tools for creating plots. The data used in creating the below ggplot comes from the `openintro` package. `OpenIntro` package details can be found below.
+
+(a) `ggplot2` website : **[rdocumentation.org/packages/ggplot2/versions/3.3.3](https://www.rdocumentation.org/packages/ggplot2/versions/3.3.3)** 
+(b) `ggplot` Github: **[github.com/cran/ggplot2](https://github.com/cran/ggplot2)**
+
+### Loading data
+
+The data used to create the plot, is the dataset `evals` from the `OpenIntro` package, noted below:\newline
+ OpenIntro Github: **[github.com/OpenIntroStat/openintro](https://github.com/OpenIntroStat/openintro)**
+ 
+* In order to verify what packages are loaded, the command `data()` can be used
+* To verify if an `OpenIntro` package directory exists on your local machine, use the command `packageDescription("openintro")`
+* If it does not or the library is not available for some reason, use `install.packages("openintro")` to install `OpenIntro`.
+* The command `help(package = "openintro")` can be used to access more documentation, regarding `OpenIntro`
+
+### Step 1: Load Library
+
+```{r, results='hide',message=FALSE}
+#Load library
+library(openintro)
+```
+
+### Step 2: Load Data
+
+```{r, messages = FALSE}
+## Load Dataset `evals` from `OpenIntro`
+data(evals)
+head(evals)
+```
+
+### Step 3: Prepare Data
+
+Dataframe `manipulated_data` is created using specifically columns `prof_id` and `score` from `evals` data set. Data is then condensed using `group_by()` function and a new column `no_rows` is added to the dataframe as shown below
+
+
+```{r, messages = FALSE}
+manipulated_data<-data.frame(Professors_ID = evals$prof_id,Score = evals$score)
+head(manipulated_data,3)
+
+manipulated_data<-manipulated_data %>% 
+  group_by(Score) %>%
+  summarise(no_rows = length(Score))
+```    
+
+### Step 4: Plot
+
+Plotting with ggplot2 the plot type has to be chosen with additional functions such as `geom_line`, `geom_density`, `geom_histogram()`, `geom_point()`, etc. \newline
+Multiple aesthetics can be applied in one graph as well, as shown by running \newline 
+
+            ggplot(data = manipulated_data,aes(x=Score, y=no_rows))+
+            geom_histogram(aes(x=no_rows,..density..))+
+            geom_density(aes(x=no_rows,..density..), color = "red", size=3)
+
+--------------------
+
+```{r ggplot_manipulated_data_basic,warning=FALSE,message=FALSE, include=TRUE,fig.show = "hold", out.width="50%", fig.height=4}
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_line()
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_density(aes(x=no_rows,..density..))
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_histogram(aes(x=no_rows,..density..))
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+geom_point()
+
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows))+
+    geom_histogram(aes(x=no_rows,..density..))+
+    geom_density(aes(x=no_rows,..density..), color = "red", size=3)
+```
+
+Below would be an example of a more complex variation, utilizing `geom_text()`,`labs()`,`theme()` and `scale_x_continous()` to create a more complex plot.
+
+```{r ggplot_manipulated_data_intermediate, echo=TRUE,warning=FALSE, include=TRUE, fig.height=4}
+# Use ggplot(),geom_bar(),geom_text(),labs)(),scale_x_continous(), and theme() to edit plot
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows,fill=no_rows)) + 
+  geom_bar(stat = "identity")+
+	geom_text(aes(label=no_rows),position = position_dodge(width = .1),vjust = -0.25)+
+	labs(title = 'Score Distribution',x = 'Score', y="Count")+
+	scale_x_continuous(breaks = unique(manipulated_data$Score)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+### Creating Snippet
+
+The first step to utilizing `reprex` involves copying the code you would like to create a snippet of then run `reprex::reprex()`, unless you already loaded the library, in which case `reprex()` will suffice.
+
+The example below will show how to make a snippet, out of all the steps taken to build the ggplot in chunk `ggplot_manipulated_data_intermediate`
+
+
+
+```{r, results='hide',fig.show='hide'}
+library(tidyverse)
+library(openintro)
+data(evals)
+#head(evals)
+manipulated_data<-data.frame(Professors_ID = evals$prof_id,Score = evals$score)
+#head(manipulated_data,3)
+
+manipulated_data<-manipulated_data %>% 
+  group_by(Score) %>%
+  summarise(no_rows = length(Score))
+
+ggplot(data = manipulated_data, aes(x=Score, y=no_rows,fill=no_rows)) + 
+  geom_bar(stat = "identity")+
+	geom_text(aes(label=no_rows),position = position_dodge(width = .1),vjust = -0.25)+
+	labs(title = 'Score Distribution',x = 'Score', y="Count")+
+	scale_x_continuous(breaks = unique(manipulated_data$Score)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![COPY_CODE](copy_snippet.png)
+
+![CONSOLE_OUTPUT](code_snippet_console.png)
+
+The resulting snippet allows for an easy copy & paste with full graphics available
+
+![Github Load Example](github_load_ex.png)
+
+Conclusion
+===========
+
+The understanding the use of ggplot is almost a requirement in my opinion, as the complex plots are best formed utilizing this function. Reprex is also invaluable, as a way to clearly display snippets of code to others while not having to share entire file. The snippets is best when posting on public forums, but also very useful when working within a team, and just needing advice for a specific section.
