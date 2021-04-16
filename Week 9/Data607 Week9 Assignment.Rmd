@@ -1,0 +1,90 @@
+---
+title: "DATA607 Week 9 Assignment"
+author: "Gabriel Campos"
+date: "`r format(Sys.Date(), '%B %d %Y')`"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = "hold")
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(shiny)
+yourkey <- rstudioapi::askForPassword("Enter API Key")
+```
+
+Overview
+========
+
+**Assignment – Web APIs**
+
+The New York Times web site provides a rich set of APIs, as described here: https://developer.nytimes.com/apis
+
+You’ll need to start by signing up for an API key.
+
+Your task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it into an R DataFrame.
+
+![](D:/Docs/CUNY_SPS_Grad/DATA607/Course Docs/Week 9 Docs/Assignment Image.png)
+
+Import Data
+===========
+
+Data is retrieved using the API url for popular articles, my query which is for articles referencing the word Woodside in the title and my api key. They are concatenated with `paste()` and stored.
+
+```{r}
+
+article_api_url <-"https://api.nytimes.com/svc/search/v2/articlesearch.json?"
+api_query     <-"query=Woodside&"
+api_key       <-paste("api-key=",yourkey)
+nyt_api_url   <-paste(article_api_url,api_query,api_key, sep = '')
+```
+
+The method `fromJSON` from the the `jsonlite` package and converted into a data frame with the columns referenced below.
+
+```{r}
+api_results <- 
+  fromJSON(nyt_api_url, flatten = TRUE)%>%
+    as.data.frame()
+```
+
+```{r,echo=FALSE}
+kableExtra::kable(names(api_results), format = "markdown")
+```
+
+I only require 4 columns for my inquiry which I also rename for better context.
+
+```{r}
+  api_results %>%
+     select(response.docs.headline.main,
+         response.docs.news_desk,
+         response.docs.web_url,
+         response.docs.word_count)%>%
+            rename("Headline" = `response.docs.headline.main`,
+            "Category" = `response.docs.news_desk`,
+            "URL"=`response.docs.web_url`,
+            "Word Count"=`response.docs.word_count`)%>%
+                arrange(desc(`Word Count`))%>%
+                  kableExtra::kable()
+```
+
+
+
+
+
+
+Conclusion
+==========
+
+My conclusion is very straight forward, I wanted to see the news article with the highest word count, published by NYTimes and be able to connect to it. The article in question is titled **The Virus Drove Churchgoers Away. Will Easter Bring Them Back?** and honestly a good read.
