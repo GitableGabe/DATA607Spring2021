@@ -20,13 +20,15 @@ editor_options:
 knitr::opts_chunk$set(eval = TRUE, results = "hold")
 library(dplyr)
 library(ggplot2)
+library(gutenbergr)
 library(janeaustenr)
+library(reactable)
+library(reshape2)
 library(stringr)
 library(textdata)
 library(tidyr)
 library(tidytext)
 library(wordcloud)
-library(reshape2)
 ```
 
 Overview
@@ -46,9 +48,12 @@ Attached Files:
 
 $As\ usual,\ please\ submit\ links\ to\ both\ an\ .Rmd\ file\ posted\ in\ your\ GitHub\ repository\ and\ to\ your\ code\ on\ rpubs.com.$\newline $\ You\ make\ work\ on\ a\ small\ team\ on\ this\ assignment.$
 
+# Primary example code from Chapter 2 {.tabset .tabset-pills} 
 
-Primary example code from Chapter 2
-===================================
+## 2.1
+
+**The `sentiments` datasets **
+
 
 ```{r, results='hold'}
 get_sentiments("afinn")
@@ -61,6 +66,10 @@ get_sentiments("bing")
 ```{r, results='hold'}
 get_sentiments("nrc")
 ```
+
+## 2.2
+
+**Sentiment analysis with inner join**
 
 ```{r}
 tidy_books <-
@@ -101,6 +110,10 @@ ggplot(jane_austen_sentiment, aes(index, sentiment, fill = book)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~book, ncol = 2, scales = "free_x")
 ```
+
+## 2.3
+
+**Comparing the three sentiment dictionaries**
 
 ```{r, results='hold'}
 pride_prejudice <- 
@@ -154,6 +167,10 @@ get_sentiments("bing") %>%
   count(sentiment)
 ```
 
+## 2.4
+
+**Most common positive and negative words**
+
 ```{r}
 bing_word_counts <- tidy_books %>%
   inner_join(get_sentiments("bing")) %>%
@@ -181,6 +198,10 @@ custom_stop_words <-
             stop_words)
 ```
 
+## 2.5
+
+**Wordclouds**
+
 ```{r}
 tidy_books %>%
   anti_join(stop_words) %>%
@@ -199,6 +220,10 @@ tidy_books %>%
                                     , "gray80"),
                           max.words = 100)
 ```
+
+## 2.6
+
+**Looking at units beyond just words**
 
 ```{r}
 p_and_p_sentences <- 
@@ -247,6 +272,36 @@ tidy_books %>%
               ungroup()
 ```
 
+# Different Data
+
+In order to conduct a sentiment analysis I will select have to select a novel from the `gutenbergr` package. its fields can be shown below.
+
+```{r, echo=FALSE}
+names(gutenberg_metadata)%>%kableExtra::kbl(col.names = c("gutenberg fields"))%>%kableExtra::kable_styling()
+```
+
+```{r}
+
+gutenberg_metadata %>%
+            select(gutenberg_id, title, gutenberg_bookshelf) %>%
+              filter(gutenberg_id>0)%>%
+               rename(id = gutenberg_id, subject = gutenberg_bookshelf)%>%
+          reactable(
+            bordered = TRUE,
+            striped = TRUE,
+            highlight = TRUE,
+            filterable = TRUE,
+            showPageSizeOptions = TRUE,
+            showPagination = TRUE,
+            columns = list(
+                    id      = colDef(minWidth = 50),
+                    title   = colDef(minWidth = 400),
+                    subject = colDef(minWidth = 200)
+                    ),
+          fullWidth = TRUE,
+          defaultPageSize = 5)
+
+```
 
 
 Conclusion
