@@ -51,6 +51,8 @@ $As\ usual,\ please\ submit\ links\ to\ both\ an\ .Rmd\ file\ posted\ in\ your\ 
 
 # Chapter 2 example {.tabset .tabset-pills} 
 
+Below are examples 2.1 - 2.6 were used verbatim from [Text Mining with R](https://www.tidytextmining.com/sentiment.html)[^1]
+
 ## 2.1
 
 **The `sentiments` datasets **
@@ -277,7 +279,7 @@ tidy_books %>%
 
 ## Corpus selection 
 
-In order to conduct a sentiment analysis I will select have to select a novel from the [^`gutenbergr`]: This is a random test. package. Its fields can be shown below. Upon selecting a corpus I will import it according to the id #.
+In order to conduct a sentiment analysis I will select have to select a novel from the `gutenbergr` [^2]: This is a random test. package. Its fields can be shown below. Upon selecting a corpus I will import it according to the id #.
 
 ```{r, echo=FALSE}
 names(gutenberg_metadata)%>%
@@ -309,7 +311,7 @@ gutenberg_metadata %>%
 
 ```
 
-Ultimately I chose to use the author of `The Legend of Sleepy Hollow` or id # `41`, whose name is `Irving, Washington`.
+Ultimately I chose to use the author of `The Legend of Sleepy Hollow` or id # `41`, whose name is `Irving, Washington` [^3].
 
 
 ```{r, message= FALSE, warning= FALSE}
@@ -322,7 +324,7 @@ Ultimately I chose to use the author of `The Legend of Sleepy Hollow` or id # `4
 
 **Tidy**
 
-I use `stop_words` in the `anti_join()` function from the `dplyr` package to remove stop words from my download, and tidy my data so that its `gutenberg_id`, `linenumber` and `word` is stored. I then get a count of each word and sort accordingly.
+I use `stop_words` in the `anti_join()` function from the `dplyr` package to remove stop words from my download, and tidy my data so that its `gutenberg_id`, `linenumber` and `word` is stored. I then get a count of each word and sort accordingly. This and all proceeding functions are heavily reference from the examples located in [Text Mining with R](https://www.tidytextmining.com/sentiment.html)
 
 
 ```{r, message = FALSE}
@@ -520,7 +522,7 @@ tdy_irv_txt %>%
 
 # Different Lexicon
 
-For this portion I decided to work with the `Syuzhet Package` and follow the material provided in the [syuzhet-vignette](https://cran.r-project.org/web/packages/syuzhet/vignettes/syuzhet-vignette.html), which involves:
+For this portion I decided to work with the `Syuzhet Package` and follow the material provided in the [syuzhet-vignette](https://cran.r-project.org/web/packages/syuzhet/vignettes/syuzhet-vignette.html)[^5], which involves:
 
 * Retrieving the text format of a text in the form of a string. Raw text source is available on [gutenberg.org](https://www.gutenberg.org/ebooks/)
 * Methods available to retrieve the text are:
@@ -535,7 +537,7 @@ For this portion I decided to work with the `Syuzhet Package` and follow the mat
     + `get_sentiment(token, method = "nrc", lang = "english")`
     + `get_sentiment(sentence_vector)`
 
-For it's usage I will again use $The\ Legend\ of\ Sleepy\ Hollow$ located [here](https://www.gutenberg.org/ebooks/41)
+For it's usage I will again use $The\ Legend\ of\ Sleepy\ Hollow$ located [here](https://www.gutenberg.org/ebooks/41)[^4]
 
 ```{r,message = FALSE, warning = FALSE}
 # import Library
@@ -654,4 +656,14 @@ However the practicality of `simple_plot()` would be my preference in most scena
 simple_plot(s_v_sentiment)
 ```
 
-[^a-random-footnote-label]: This is a random test.
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
+
+[^1]: Robinson, J. S. and D. (n.d.). Text mining with r: A tidy approach. https://www.tidytextmining.com/sentiment.html.:
+
+[^2]: Search. (n.d.). Retrieved April 19, 2021, from https://www.gutenberg.org/ebooks/.:
+
+[^3]: Irving, Washington, 1783-1859. Rip Van Winkle, And The Legend of Sleepy Hollow. New York, Macmillan, 1963.:
+
+[^4]: Gutenberg. (n.d.). Retrieved April 19, 2021, from https://www.gutenberg.org/files/41/41-0.txt:
+
+[^5]: Robinson, J. (n.d.). Text mining with r: A tidy approach. Retrieved April 19, 2021, from https://www.tidytextmining.com/:
