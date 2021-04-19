@@ -1,5 +1,5 @@
 ---
-title: "DATA607 Week 9 Assignment"
+title: "DATA607 Week 10 Assignment"
 author: "Gabriel Campos"
 date: "`r format(Sys.Date(), '%B %d %Y')`"
 output: 
@@ -28,6 +28,7 @@ library(stringr)
 library(textdata)
 library(tidyr)
 library(tidytext)
+library(tidyverse)
 library(wordcloud)
 ```
 
@@ -48,7 +49,7 @@ Attached Files:
 
 $As\ usual,\ please\ submit\ links\ to\ both\ an\ .Rmd\ file\ posted\ in\ your\ GitHub\ repository\ and\ to\ your\ code\ on\ rpubs.com.$\newline $\ You\ make\ work\ on\ a\ small\ team\ on\ this\ assignment.$
 
-# Primary example code from Chapter 2 {.tabset .tabset-pills} 
+# Chapter 2 example {.tabset .tabset-pills} 
 
 ## 2.1
 
@@ -272,18 +273,22 @@ tidy_books %>%
               ungroup()
 ```
 
-# Different Data
+# Different Corpus {.tabset .tabset-pills}
 
-In order to conduct a sentiment analysis I will select have to select a novel from the `gutenbergr` package. its fields can be shown below.
+## Corpus selection 
+
+In order to conduct a sentiment analysis I will select have to select a novel from the [^`gutenbergr`]: This is a random test. package. Its fields can be shown below. Upon selecting a corpus I will import it according to the id #.
 
 ```{r, echo=FALSE}
-names(gutenberg_metadata)%>%kableExtra::kbl(col.names = c("gutenberg fields"))%>%kableExtra::kable_styling()
+names(gutenberg_metadata)%>%
+  kableExtra::kbl(col.names = c("gutenberg fields"))%>%
+  kableExtra::kable_styling()
 ```
 
 ```{r}
 
 gutenberg_metadata %>%
-            select(gutenberg_id, title, gutenberg_bookshelf) %>%
+            select(gutenberg_id, title,author, gutenberg_bookshelf) %>%
               filter(gutenberg_id>0)%>%
                rename(id = gutenberg_id, subject = gutenberg_bookshelf)%>%
           reactable(
@@ -294,8 +299,9 @@ gutenberg_metadata %>%
             showPageSizeOptions = TRUE,
             showPagination = TRUE,
             columns = list(
-                    id      = colDef(minWidth = 50),
+                    id      = colDef(minWidth = 70),
                     title   = colDef(minWidth = 400),
+                    author  = colDef(minWidth = 100),
                     subject = colDef(minWidth = 200)
                     ),
           fullWidth = TRUE,
@@ -303,6 +309,349 @@ gutenberg_metadata %>%
 
 ```
 
+Ultimately I chose to use the author of `The Legend of Sleepy Hollow` or id # `41`, whose name is `Irving, Washington`.
 
-Conclusion
-==========
+
+```{r, message= FALSE, warning= FALSE}
+(irv_txt <- gutenberg_download(c(41, 877, 1371, 1850, 2048, 3293, 7002, 7948, 7993, 7994, 8519, 8571, 13042, 13514, 13515, 14228, 19293, 20656, 21195, 32987, 36652, 38192, 49258, 49259, 49872, 49947, 50352)))
+```
+
+## Tidy, Bing & NRC {.tabset }
+
+### Sentiment Analysis
+
+**Tidy**
+
+I use `stop_words` in the `anti_join()` function from the `dplyr` package to remove stop words from my download, and tidy my data so that its `gutenberg_id`, `linenumber` and `word` is stored. I then get a count of each word and sort accordingly.
+
+
+```{r, message = FALSE}
+tdy_irv_txt <-
+  irv_txt %>%
+    mutate(linenumber = row_number()) %>%
+              unnest_tokens(word, text) %>%
+                anti_join(stop_words)
+
+irv_cnt<-
+  tdy_irv_txt %>%
+  count(word, sort = TRUE)
+```
+
+**Bing**
+
+Using bing, I'm concerned with the sentiment based on the word. Following the example from 2.2 exactly provides the below results
+
+```{r, message = FALSE}
+(tdy_irv_bng <- 
+  tdy_irv_txt %>%
+    inner_join(get_sentiments("bing")) %>%
+      count(word,
+            index = linenumber %/% 80,
+            sentiment) %>%
+        pivot_wider(names_from = sentiment,
+                    values_from = n,
+                    values_fill = 0) %>% 
+          mutate(sentiment = positive - negative))
+```
+
+I found a full count more useful however
+
+```{r, message=FALSE}
+(tdy_irv_bng_cnts <-
+  tdy_irv_txt %>%
+    inner_join(get_sentiments("bing")) %>%
+      count(word, sentiment, sort = TRUE) %>%
+        ungroup())
+```
+
+**NRC**
+
+The above mentioned `pipe` with `innerjoin` command can also provide a very functional way to utilize `NRC` sentiment.
+
+```{r, message= FALSE}
+(nrc_cnts <- 
+  tdy_irv_txt %>%
+    inner_join(get_sentiments("nrc")) %>%
+      count(word, sentiment, sort = TRUE) %>%
+        ungroup())
+```
+
+if we use the `nrc_joy` filtered sentiment from 2.2 on `gutenberg_id` number `41` for $The\ Legend\ of\ Sleepy\ Hollow$ the results are as follows
+
+```{r}
+tdy_irv_txt %>%
+  filter(gutenberg_id == 41) %>%
+  inner_join(nrc_joy) %>%
+  count(word, sort = TRUE)
+```
+
+### Comparing 3 Sentiment dictionaries
+
+Here we test the presence of afinnn, bing and nrc in Washington Irvin's work. the afinn and bing_and_nrc variables are overwritten with our new results.
+
+```{r,message= FALSE}
+afinn <- 
+  tdy_irv_txt %>% 
+    inner_join(get_sentiments("afinn")) %>% 
+      group_by(index = linenumber %/% 5) %>% 
+        summarise(sentiment = sum(value)) %>% 
+          mutate(method = "AFINN")
+```
+
+```{r,message= FALSE}
+
+bing_and_nrc <- 
+  bind_rows(
+    tdy_irv_txt %>% 
+      inner_join(get_sentiments("bing")) %>%
+        mutate(method = "Bing et al."),
+          tdy_irv_txt %>% 
+            inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative"))
+    ) %>%
+    mutate(method = "NRC")) %>%
+      count(method,
+            index = linenumber %/% 5,
+            sentiment) %>%
+          pivot_wider(names_from = sentiment,
+              values_from = n,
+              values_fill = 0) %>% 
+                mutate(sentiment = positive - negative)
+```
+
+```{r, message=FALSE}
+bind_rows(afinn, 
+          bing_and_nrc) %>%
+  ggplot(aes(index, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~method, ncol = 1, scales = "free_y")
+```
+
+From here `gutenberg_id` number `41` for $The\ Legend\ of\ Sleepy\ Hollow$ is again used.
+
+```{r, message=FALSE}
+(Sleepy_Hollow<-
+  tdy_irv_txt %>%
+    filter(gutenberg_id == 41))
+
+```
+
+```{r, message=FALSE}
+afinn_sh <- Sleepy_Hollow %>% 
+  inner_join(get_sentiments("afinn")) %>% 
+  group_by(index = linenumber %/% 5) %>% 
+  summarise(sentiment = sum(value)) %>% 
+  mutate(method = "AFINN")
+```
+
+```{r, message=FALSE}
+bing_and_nrc_sh <- bind_rows(
+  Sleepy_Hollow %>% 
+    inner_join(get_sentiments("bing")) %>%
+    mutate(method = "Bing et al."),
+  Sleepy_Hollow %>% 
+    inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative"))
+    ) %>%
+    mutate(method = "NRC")) %>%
+  count(method, index = linenumber %/% 5, sentiment) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = n,
+              values_fill = 0) %>% 
+  mutate(sentiment = positive - negative)
+```
+
+```{r, message=FALSE}
+bind_rows(afinn_sh, 
+          bing_and_nrc_sh) %>%
+  ggplot(aes(index, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~method, ncol = 1, scales = "free_y")
+```
+
+### Most common $+$ & $-$ words
+
+Again over writing variable `bing_word_counts`
+
+```{r, message=FALSE}
+(bing_word_counts <- 
+  tdy_irv_txt %>%
+    inner_join(get_sentiments("bing")) %>%
+      count(word, sentiment, sort = TRUE) %>%
+        ungroup())
+```
+
+```{r, message=FALSE, warning=FALSE}
+bing_word_counts %>%
+  group_by(sentiment) %>%
+  slice_max(n, n = 10) %>% 
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  labs(x = "Contribution to sentiment",
+       y = NULL)
+```
+
+### WordClouds
+
+```{r, message=FALSE, warning=FALSE}
+set.seed(528)
+tdy_irv_txt %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100,
+          rot.per=0.35,
+          colors=brewer.pal(7, "Accent")))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+tdy_irv_txt %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(colors = c("red", "blue"),
+                   max.words = 100)
+```
+
+# Different Lexicon
+
+For this portion I decided to work with the `Syuzhet Package` and follow the material provided in the [syuzhet-vignette](https://cran.r-project.org/web/packages/syuzhet/vignettes/syuzhet-vignette.html), which involves:
+
+* Retrieving the text format of a text in the form of a string. Raw text source is available on [gutenberg.org](https://www.gutenberg.org/ebooks/)
+* Methods available to retrieve the text are:
+    + `get_text_as_string()`
+    + `get_tokens()`
+    + `get_sentences()`
+* Use of `get_sentiment()` on the collected sentence or tokens
+* Various methods can be used with `get_sentiment()` e.g.:
+    + `get_sentiment(token, method="syuzhet")`
+    + `get_sentiment(token, method = "bing")`
+    + `get_sentiment(token, method = "afinn")`
+    + `get_sentiment(token, method = "nrc", lang = "english")`
+    + `get_sentiment(sentence_vector)`
+
+For it's usage I will again use $The\ Legend\ of\ Sleepy\ Hollow$ located [here](https://www.gutenberg.org/ebooks/41)
+
+```{r,message = FALSE, warning = FALSE}
+# import Library
+library(syuzhet)
+# Retrieve text
+sh_book <- get_text_as_string("https://www.gutenberg.org/files/41/41.txt")
+# create sentence vector
+str(sh_s_v<- get_sentences(sh_book))
+# Create Tokens
+book_v <- get_tokens(sh_book, pattern = "\\W")
+# create vectors
+syuzhet_vector  <- get_sentiment(book_v, method="syuzhet")
+bing_vector     <- get_sentiment(book_v, method = "bing")
+afinn_vector    <- get_sentiment(book_v, method = "afinn")
+nrc_vector      <- get_sentiment(book_v, method = "nrc", lang = "english")
+s_v_sentiment   <- get_sentiment(sh_s_v)
+
+```
+
+The heads of which in is shown in the 4x6 matrix below.
+
+```{r,message = FALSE, warning = FALSE}
+rbind(
+  sign(head(syuzhet_vector)),
+  sign(head(bing_vector)),
+  sign(head(afinn_vector)),
+  sign(head(nrc_vector))
+)
+```
+
+specifically the sum, mean and summary of the syuzhet_vector is as follows
+
+```{r,warning=FALSE, message=FALSE}
+sum(syuzhet_vector)
+mean(syuzhet_vector)
+summary(syuzhet_vector)
+```
+
+My goal was to use the methods noted in the vignette and see how it would change my understanding of the book `Sleep Hollow` if it did at all. `plot()` function was used with both the `syuzhet_vector` and `s_v_sentiment` my sentence vectors as a measure of the negative and positive sentiments throughout the story. X being here a measurement of time, Y varying according to time withing the story.
+
+I unfortunately found this plot the least useful, since as the vignette notes, $'for\ visualization\ it\ is\ generally\ preferable\ to\ remove\ the\ noise\ and\ reveal\ the\ simple\ shape\ of\ the\ trajectory'$
+
+```{r,warning=FALSE, message=FALSE}
+plot(
+  syuzhet_vector, 
+  type="h", 
+  main="syuzhet vector Plot Trajectory", 
+  xlab = "Narrative Time", 
+  ylab= "Emotional Valence"
+  )
+
+plot(
+  s_v_sentiment, 
+  type="l", 
+  main="Sentence Vector Plot Trajectory", 
+  xlab = "Narrative Time", 
+  ylab= "Emotional Valence"
+  )
+```
+
+I feel the percentage based plot was most useful, indicat a steady rise in negativity in what I beleive to be the climax of the book and a huge shift to a positive valence, in the conclusion.
+
+```{r,warning=FALSE, message=FALSE}
+percent_vals <- get_percentage_values(syuzhet_vector, bins = 10)
+plot(
+  percent_vals, 
+  type="l", 
+  main="Sleepy Hollow Using Percentage-Based Means", 
+  xlab = "Narrative Time", 
+  ylab= "Emotional Valence", 
+  col="red"
+  )
+```
+
+Using `Percentage-Base Means` echos the plot above, with more fluctuation which is more inline with how this story is particularly told in my perspective.
+
+```{r,warning=FALSE, message=FALSE}
+percent_vals <- get_percentage_values(syuzhet_vector, bins = 20)
+plot(
+  percent_vals, 
+  type="l", 
+  main="Sleepy Hollow Using Percentage-Based Means", 
+  xlab = "Narrative Time", 
+  ylab= "Emotional Valence", 
+  col="red"
+  )
+```
+
+Visually utilization of ft_values to smooth out these representations limits the chaotic perception given from percent_vals.
+
+```{r,warning=FALSE, message=FALSE}
+ft_values <- get_transformed_values(
+      syuzhet_vector, 
+      low_pass_size = 3, 
+      x_reverse_len = 100,
+      padding_factor = 2,
+      scale_vals = TRUE,
+      scale_range = FALSE
+      )
+```
+
+```{r}
+plot(
+  ft_values, 
+  type ="l", 
+  main ="Joyce's Portrait using Transformed Values", 
+  xlab = "Narrative Time", 
+  ylab = "Emotional Valence", 
+  col = "red"
+  )
+```
+
+However the practicality of `simple_plot()` would be my preference in most scenarios.
+
+```{r}
+simple_plot(s_v_sentiment)
+```
+
+[^a-random-footnote-label]: This is a random test.
