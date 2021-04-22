@@ -71,4 +71,51 @@ This process of guessing/reverse engineering, while inexact, will help you build
 
 **3 Question Framework**
 
-1. 
+**1**. **Who are your target users?** \newline
+
+* Customers hoping to have food delivered, Restaurants trying to increase business, Couriers earning off deliveries.
+
+**2**. **What are there key goals?**\newline
+
+  + The key goals are:
+      * To ensure consumers are provided information of local restaurants and their menu, based on their          current geographic location.
+      * Have restaurants provide up to date information regarding pricing and products.
+      * Have new businesses register on their sites.
+
+The focus here will be the consumer, as recommender systems are driven by there interaction with the site/application.
+
+**3**. **How can you help them accomplish these goals?**
+
+* Categorize foods based on region of origin, food type (poultry, burger, pizza, etc.), and health value
+* Provide real-time updates of order made and delivery time. 
+* Keep track of Restaurant performance and complaints, with a easily digestable rating board.
+* Offer promotions based on new business, holidays or climate.
+* Offer recommendations to different.
+
+## Reverse Engineer
+
+Grub Hub's recommender system, relies heavily on tidying it's data from the restaurants menus. The reason for this is because restaurant try their best to stand out, and in doing so, make all the items in their menu as unique as possible. Burgers from diners vs fast food restaurants vs high end restaurants, can be labeled *"bistro"*, *"slider"*, *"garden"*, etc. complicating there categorization. Wording in the description of the menu items can use non standard spelling, or use a identifier that changes the entire *"flavor"* of a food item (Japanese curry vs Indian curry). To address this grubhub:
+
+1. collects menus of all of its restaurant clients (over 14 million)
+2. Use logs and reviews (internal and external) to compare customer orders with end results at a restaurant. 
+3. Review customer historical data focusing on frequency and item quantity.
+
+To refine the above skeletal structure, GrubHub uses a *"cuisine dictionary"* that is implemented similar to a sentiment analysis by categorizing these items.
+
+The end result is a loosely tied algorithm that allows for recommendation to its consumers that encourages user continued purchases.
+
+## Recommendations
+
+Suggestions to improve the site's recommencation effectiveness may be:
+
+* A larger *"cuisine dictionary"*. As of 2018, the dictionary in question had around 4,000 main categories plus additional sub categories. This does not cover the variety of food nationwide and worldwide, specifically when noting hybrid cuisines.
+* Draw relationships from staff. Chefs often influence or are influenced by each other, drawing links between cooking styles, mentors, mentees, culinary schools etc. is a category that can be used to better recommend consumers.
+* Coordinate with Airbnb and other applications that involve travel such as trip adviser. GrubHub me be able to influence it's clientele into researching new areas to travel based on the type of local cuisine. Most travel programs, highlight specialty dishes specific to a region and collaboration with other applications can lead to better revenue.
+
+
+
+# References
+
+1. 2021. [online] Available at: <https://www.ncrypted.net/blog/how-does-grubhub-work/> [Accessed 22 April 2021].
+
+2. Rogers, A., 2021. How Grubhub Analyzed 4,000 Dishes to Predict Your Next Order. [online] Wired. Available at: <https://www.wired.com/story/how-grubhub-analyzed-4000-dishes-to-predict-your-next-order/> [Accessed 22 April 2021].
