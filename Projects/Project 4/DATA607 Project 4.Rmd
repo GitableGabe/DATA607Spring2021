@@ -1,5 +1,5 @@
 ---
-title: "DATA607 Project 2"
+title: "DATA607 Project 4"
 author: "Gabriel Campos"
 date: "`r format(Sys.Date(), '%B %d %Y')`"
 output:
@@ -32,12 +32,14 @@ library(reactable)
 library(kableExtra)
 library(stringr)
 library(magrittr)
+library(downloader)
 ```
 
 <!-- (https://rdrr.io/cran/reactable/man/reactable.html) -->
 
+# Assignment{.tabset}
 
-# Assignment Requirements{.tabset}
+## Requirements
 
 It can be useful to be able to classify new "test" documents using already classified "training"
 documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to 
@@ -64,3 +66,45 @@ For more adventurous students, you are welcome (encouraged!) to come up with a d
 * [Tidy Modeling with R, Max Kuhn and Julia Silge](https://www.tmwr.org/). Julia Silge has also done a number of tidymodels screencasts, including [here](https://www.youtube.com/watch?v=BgWCuyrwD1s)
 * [github.com/tidymodels/textrecipes](https://github.com/tidymodels/textrecipes)
 * DataCamp course, [Modeling with TidyModels in R](https://learn.datacamp.com/courses/modeling-with-tidymodels-in-r)
+
+## Load Data
+
+URL of file and filename is set by `easy_ham_URL` and `easy_ham_tar` respectively.
+
+```{r}
+easy_ham_URL = "http://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2"
+easy_ham_tar = "20021010_easy_ham.tar.bz2"
+ham_dir      = "unzipped_files\\easy_ham\\"
+```
+
+The functions [`download.file()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/download.file) and [`untar()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/untar) is used to download the tar file. The function [`list.files`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/list.files) is used with the variable `ham_dir` specified above to import the individual files for `20021010_easy_ham.tar.bz2`.
+
+```{r class.source = "fold-show", warning=FALSE, echo=TRUE}
+
+download.file(url = easy_ham_URL, destfile = easy_ham_tar)
+untar(easy_ham_tar, exdir="unzipped_files", compressed = "bzip2")
+ham_files = list.files(path = ham_dir,full.names = TRUE)
+```
+
+`list.files` is also used with several piping functions (`%>%`) to create a data frame with `email_ID`, `text`, `class`, and binary valued `spam` column as shown below
+
+```{r}
+ham <-
+  list.files(path = ham_dir) %>%
+    as.data.frame() %>%
+      set_colnames("email_ID") %>%
+        mutate(text = lapply(ham_files, read_lines)) %>%
+          unnest(c(text)) %>%
+            mutate(class = "ham",
+                  spam = 0) %>%
+                    group_by(email_ID) %>%
+            mutate(text = paste(text, collapse = " ")) %>%
+                            ungroup() %>%
+                              distinct()
+```
+
+```{r, echo=FALSE}
+head(ham,5)
+
+```
+
