@@ -1707,14 +1707,27 @@ div.tocify {
 <div id="load-data" class="section level2">
 <h2>Load Data</h2>
 <p>URL of file and filename is set by <code>easy_ham_URL</code> and <code>easy_ham_tar</code> respectively.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>easy_ham_URL =<span class="st"> &quot;http://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2&quot;</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a>easy_ham_tar =<span class="st"> &quot;20021010_easy_ham.tar.bz2&quot;</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a>ham_dir      =<span class="st"> &quot;unzipped_files</span><span class="ch">\\</span><span class="st">easy_ham</span><span class="ch">\\</span><span class="st">&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#easy_ham.tar.bz2 import</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>easy_ham_URL =<span class="st"> </span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="st">  &quot;http://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>easy_ham_tar =<span class="st"> &quot;20021010_easy_ham.tar.bz2&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>ham_dir      =<span class="st"> &quot;unzipped_files</span><span class="ch">\\</span><span class="st">easy_ham</span><span class="ch">\\</span><span class="st">&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a></span>
+<span id="cb1-7"><a href="#cb1-7"></a>spam_URL =<span class="st"> </span></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="st">  &quot;http://spamassassin.apache.org/old/publiccorpus/20021010_spam.tar.bz2&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>spam_tar     =<span class="st"> &quot;20021010_spam.tar.bz2&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>spam_dir     =<span class="st"> &quot;unzipped_files</span><span class="ch">\\</span><span class="st">spam</span><span class="ch">\\</span><span class="st">&quot;</span></span></code></pre></div>
 <p>The functions <a href="https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/download.file"><code>download.file()</code></a> and <a href="https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/untar"><code>untar()</code></a> is used to download the tar file. The function <a href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/list.files"><code>list.files</code></a> is used with the variable <code>ham_dir</code> specified above to import the individual files for <code>20021010_easy_ham.tar.bz2</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r fold-show"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">download.file</span>(<span class="dt">url =</span> easy_ham_URL, <span class="dt">destfile =</span> easy_ham_tar)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">untar</span>(easy_ham_tar, <span class="dt">exdir=</span><span class="st">&quot;unzipped_files&quot;</span>, <span class="dt">compressed =</span> <span class="st">&quot;bzip2&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3"></a>ham_files =<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">path =</span> ham_dir,<span class="dt">full.names =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
-<p><code>list.files</code> is also used with several piping functions (<code>%&gt;%</code>) to create a data frame with <code>email_ID</code>, <code>text</code>, <code>class</code>, and binary valued <code>spam</code> column as shown below</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r fold-hide"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># ham zip file download</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">download.file</span>(<span class="dt">url =</span> easy_ham_URL, <span class="dt">destfile =</span> easy_ham_tar)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">untar</span>(easy_ham_tar, <span class="dt">exdir=</span><span class="st">&quot;unzipped_files&quot;</span>, <span class="dt">compressed =</span> <span class="st">&quot;bzip2&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>ham_files =<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">path =</span> ham_dir,<span class="dt">full.names =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co"># spam zip file download</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="kw">download.file</span>(<span class="dt">url =</span> spam_URL, <span class="dt">destfile =</span> spam_tar)</span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="kw">untar</span>(spam_tar, <span class="dt">exdir=</span><span class="st">&quot;unzipped_files&quot;</span>, <span class="dt">compressed =</span> <span class="st">&quot;bzip2&quot;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>spam_files =<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">path =</span> spam_dir,<span class="dt">full.names =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p><code>list.files</code> is also used with several piping functions (<code>%&gt;%</code>) to create a data frame with <code>email_ID</code>, <code>text</code>, <code>class</code>, and <code>double</code> value <code>spam</code> column as shown below</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>ham &lt;-</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="st">  </span><span class="kw">list.files</span>(<span class="dt">path =</span> ham_dir) <span class="op">%&gt;%</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="st">    </span><span class="kw">as.data.frame</span>() <span class="op">%&gt;%</span></span>
@@ -1735,6 +1748,33 @@ div.tocify {
 ## 3 0003.acfc5ad94bbd27118~ &quot;From timc@2ubh.com  Thu Aug 22 13:52:59 ~ ham       0
 ## 4 0004.e8d5727378ddde5c3~ &quot;From irregulars-admin@tb.tf  Thu Aug 22 ~ ham       0
 ## 5 0005.8c3b9e9c0f3f183dd~ &quot;From exmh-users-admin@redhat.com  Thu Au~ ham       0</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>spam &lt;-</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="st">  </span><span class="kw">list.files</span>(<span class="dt">path =</span> spam_dir) <span class="op">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="st">    </span><span class="kw">as.data.frame</span>() <span class="op">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="st">      </span><span class="kw">set_colnames</span>(<span class="st">&quot;email_ID&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="st">        </span><span class="kw">mutate</span>(<span class="dt">text =</span> <span class="kw">lapply</span>(spam_files, read_lines)) <span class="op">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="st">          </span><span class="kw">unnest</span>(<span class="kw">c</span>(text)) <span class="op">%&gt;%</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="st">            </span><span class="kw">mutate</span>(<span class="dt">class =</span> <span class="st">&quot;spam&quot;</span>,</span>
+<span id="cb5-8"><a href="#cb5-8"></a>                  <span class="dt">spam =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="st">                    </span><span class="kw">group_by</span>(email_ID) <span class="op">%&gt;%</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="st">            </span><span class="kw">mutate</span>(<span class="dt">text =</span> <span class="kw">paste</span>(text, <span class="dt">collapse =</span> <span class="st">&quot; &quot;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="st">                            </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="st">                              </span><span class="kw">distinct</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 5 x 4
+##   email_ID                text                                       class  spam
+##   &lt;chr&gt;                   &lt;chr&gt;                                      &lt;chr&gt; &lt;dbl&gt;
+## 1 0000.7b1b73cf36cf9dbc3~ &quot;mv 1 00001.bfc8d64d12b325ff385cca8d07b84~ spam      1
+## 2 0001.bfc8d64d12b325ff3~ &quot;From 12a1mailbot1@web.de  Thu Aug 22 13:~ spam      1
+## 3 0002.24b47bb3ce90708ae~ &quot;From ilug-admin@linux.ie  Thu Aug 22 13:~ spam      1
+## 4 0003.4b3d943b8df71af24~ &quot;From sabrina@mx3.1premio.com  Thu Aug 22~ spam      1
+## 5 0004.1874ab60c71f0b31b~ &quot;From wsup@playful.com  Thu Aug 22 16:17:~ spam      1</code></pre>
+</div>
+<div id="training-data" class="section level2">
+<h2>Training Data</h2>
+<!------- Below is for removing excessive space in Rmarkdown | HTML formatting -------->
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;">
+
+</div>
 </div>
 </div>
 
@@ -1775,7 +1815,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
+  window.initializeCodeFolding("show" === "show");
 });
 </script>
 

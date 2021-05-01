@@ -4,7 +4,7 @@ author: "Gabriel Campos"
 date: "`r format(Sys.Date(), '%B %d %Y')`"
 output:
   html_document:
-    code_folding: "hide"
+    code_folding: "show"
     includes:
       in_header: header.html
     css: ./lab.css
@@ -72,21 +72,33 @@ For more adventurous students, you are welcome (encouraged!) to come up with a d
 URL of file and filename is set by `easy_ham_URL` and `easy_ham_tar` respectively.
 
 ```{r}
-easy_ham_URL = "http://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2"
+#easy_ham.tar.bz2 import
+easy_ham_URL = 
+  "http://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2"
 easy_ham_tar = "20021010_easy_ham.tar.bz2"
 ham_dir      = "unzipped_files\\easy_ham\\"
+
+spam_URL = 
+  "http://spamassassin.apache.org/old/publiccorpus/20021010_spam.tar.bz2"
+spam_tar     = "20021010_spam.tar.bz2"
+spam_dir     = "unzipped_files\\spam\\"
 ```
 
 The functions [`download.file()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/download.file) and [`untar()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/untar) is used to download the tar file. The function [`list.files`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/list.files) is used with the variable `ham_dir` specified above to import the individual files for `20021010_easy_ham.tar.bz2`.
 
-```{r class.source = "fold-show", warning=FALSE, echo=TRUE}
-
+```{r class.source = "fold-hide", warning=FALSE, echo=TRUE}
+# ham zip file download
 download.file(url = easy_ham_URL, destfile = easy_ham_tar)
 untar(easy_ham_tar, exdir="unzipped_files", compressed = "bzip2")
 ham_files = list.files(path = ham_dir,full.names = TRUE)
+
+# spam zip file download
+download.file(url = spam_URL, destfile = spam_tar)
+untar(spam_tar, exdir="unzipped_files", compressed = "bzip2")
+spam_files = list.files(path = spam_dir,full.names = TRUE)
 ```
 
-`list.files` is also used with several piping functions (`%>%`) to create a data frame with `email_ID`, `text`, `class`, and binary valued `spam` column as shown below
+`list.files` is also used with several piping functions (`%>%`) to create a data frame with `email_ID`, `text`, `class`, and `double` value `spam` column as shown below
 
 ```{r}
 ham <-
@@ -108,3 +120,30 @@ head(ham,5)
 
 ```
 
+```{r}
+spam <-
+  list.files(path = spam_dir) %>%
+    as.data.frame() %>%
+      set_colnames("email_ID") %>%
+        mutate(text = lapply(spam_files, read_lines)) %>%
+          unnest(c(text)) %>%
+            mutate(class = "spam",
+                  spam = 1) %>%
+                    group_by(email_ID) %>%
+            mutate(text = paste(text, collapse = " ")) %>%
+                            ungroup() %>%
+                              distinct()
+```
+
+```{r, echo=FALSE}
+head(spam,5)
+
+```
+
+## Training Data
+
+
+
+<!------- Below is for removing excessive space in Rmarkdown | HTML formatting -------->
+
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
