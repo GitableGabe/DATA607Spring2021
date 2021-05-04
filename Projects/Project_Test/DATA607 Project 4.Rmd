@@ -26,13 +26,13 @@ editor_options:
     "sandstone", "simplex", "yeti"  -------->
 
 ```{r, echo=FALSE,warning=FALSE, results='hide', include=FALSE}
-library(discrim)
-library(downloader)
-library(dplyr)
-library(magrittr)
-library(tidymodels)
-library(textrecipes)
 library(tidyverse)
+library(dplyr)
+library(reactable)
+library(kableExtra)
+library(stringr)
+library(magrittr)
+library(downloader)
 ```
 
 <!-- (https://rdrr.io/cran/reactable/man/reactable.html) -->
@@ -65,13 +65,11 @@ For more adventurous students, you are welcome (encouraged!) to come up with a d
 * [github.com/tidymodels/textrecipes](https://github.com/tidymodels/textrecipes)
 * DataCamp course, [Modeling with TidyModels in R](https://learn.datacamp.com/courses/modeling-with-tidymodels-in-r)
 
-## Data Preparation {.tabset .tabset-pills}
-
-### Load Data
+## Load Data
 
 URL of file and filename is set by `URL_easy_ham` and `tar_easy_ham` respectively.
 
-```{r class.source = "fold-hide"}
+```{r}
 #easy_ham.tar.bz2 import
 URL_easy_ham = 
   "http://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2"
@@ -86,22 +84,19 @@ dir_spam     = "unzipped_files\\spam\\"
 
 The functions [`download.file()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/download.file) and [`untar()`](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/untar) is used to download the tar file. The function [`list.files`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/list.files) is used with the variable `ham_dir` specified above to import the individual files for `20021010_easy_ham.tar.bz2`.
 
-```{r, warning=FALSE}
+```{r class.source = "fold-hide", warning=FALSE, echo=TRUE}
 # ham zip file download
 download.file(url = URL_easy_ham, destfile = tar_easy_ham)
 untar(tar_easy_ham, exdir="unzipped_files", compressed = "bzip2")
 files_easy_ham = list.files(path = dir_easy_ham,full.names = TRUE)
-```
 
-
-```{r class.source = "fold-hide", warning=FALSE, echo=TRUE}
 # spam zip file download
 download.file(url = URL_spam, destfile = tar_spam)
 untar(tar_spam, exdir="unzipped_files", compressed = "bzip2")
 files_spam = list.files(path = dir_spam,full.names = TRUE)
 ```
 
-`list.files` is also used with several piping functions (`%>%`) to create a data frame with `email_ID`, `text`, `class`, and `double` value `spam` column as shown below for the `easy_ham` data. This step is repeated with `spam` data as well.
+`list.files` is also used with several piping functions (`%>%`) to create a data frame with `email_ID`, `text`, `class`, and `double` value `spam` column as shown below
 
 ```{r}
 df_easy_ham <-
@@ -118,7 +113,12 @@ df_easy_ham <-
                               distinct()
 ```
 
-```{r class.source = "fold-hide"}
+```{r, echo=FALSE}
+head(easy_ham,5)
+
+```
+
+```{r}
 df_spam <-
   list.files(path = dir_spam) %>%
     as.data.frame() %>%
@@ -133,143 +133,19 @@ df_spam <-
                               distinct()
 ```
 
-### Create Classification & Naives Models
+```{r}
+easy_ham$text[1:2]
+```
 
-Both dataframes are merged using `rbind`.\newline
+
+## Training Data
 
 ```{r}
 df_easy_ham_spam <- rbind(df_easy_ham, df_spam)
 
 ```
 
-```{r, echo=FALSE}
-# glimpse(df_easy_ham_spam)
-```
 
-Afterwards, using the [`tidymodels package`](https://www.tidymodels.org/packages/), we create a single binary split of our merged dataframe `df_easy_ham_spam`, with [`initial_split()`](https://www.rdocumentation.org/packages/rsample/versions/0.0.9/topics/initial_split), specifying `strata = class`, making the `class` column our stratified sample. This is used to separate the data into [*training* and *testing*](https://www.r-bloggers.com/2019/06/a-gentle-introduction-to-tidymodels/) sets in conjunction with the `training()` and `testing()` functions, as shown below. 
-
-
-```{r}
-set.seed(3239)
-df_split    <- initial_split(df_easy_ham_spam, strata = class)
-df_train    <- training(df_split)
-df_test     <- testing(df_split)
-```
-
-```{r, echo = FALSE}
-paste0("Training dimensions are ")
-paste0(dim(df_train))
-paste0("Test dimensions are ")
-paste0(dim(df_test))
-```
-
-Using the [`recipe()`](https://www.rdocumentation.org/packages/recipes/versions/0.1.16/topics/recipe) also a part of `tidymodels` we lay out the description to be applied to our data sets. This is in preparation for the processing and tokenizing of the data.
-
-```{r}
-df_rec <- 
-  recipe(class ~ text, data = df_train)
-```
-
-The words in the `text` column is tokenized using `step_tokenize()` and the *term frequency-inverse document frequency* is calculated for text analysis with `step_tokenfilter` thanks to the [`textrecipes package`](https://cran.r-project.org/web/packages/textrecipes/index.html)
-
-```{r}
-df_rec <- df_rec %>%
-  step_tokenize(text) %>%
-  step_tokenfilter(text, max_tokens = 10) %>%
-  step_tfidf(text)
-```
-
-From this point the tokenized data is used in [`add_recipe`](https://www.rdocumentation.org/packages/workflows/versions/0.2.2/topics/add_recipe), to specify the terms of the workflow allow it to be added to a container with [`workflow()`](https://www.rdocumentation.org/packages/workflows/versions/0.1.1/topics/workflow), and stored to `df_wf`
-
-
-```{r}
-df_wf <- workflow() %>%
-  add_recipe(df_rec)
-```
-
-```{r}
-(nb_spec <- naive_Bayes() %>%
-  set_mode("classification") %>%
-  set_engine("naivebayes"))
-```
-
-```{r}
-nb_fit <- df_wf %>%
-  add_model(nb_spec) %>%
-  fit(data = df_train)
-```
-
-## Evaluation
-
-In order to use the Bayes classifcation we start by using [`vfold_cv()`](https://www.rdocumentation.org/packages/rsample/versions/0.0.9/topics/vfold_cv) to split the data randomly, into 10 equal sized folds, then again store it into a container with `workflow()`, `add_recipe()` and `add_model()`
-
-```{r class.source = "fold-hide"}
-set.seed(234)
-(df_folds <- vfold_cv(df_train))
-```
-
-```{r}
-(nb_wf <- 
-  workflow() %>%
-  add_recipe(df_rec) %>%
-  add_model(nb_spec))
-```
-
-Performance of the models is estimated by fitting several models, once, in each re-sampled fold and then evaluating on the heldout part.
-
-```{r class.source = "fold-hide", warning=FALSE}
-nb_rs <- 
-  fit_resamples(
-  nb_wf,
-  df_folds,
-  control =
-    control_resamples(save_pred = TRUE)
-)
-```
-
-Data is extracted with [`collect_metrics()`](https://tune.tidymodels.org/reference/collect_predictions.html) which creates a `.metric` and `.estimator` column unless summarized and [`collect_predictions()`](https://tune.tidymodels.org/reference/collect_predictions.html) which creates predictive value columns.
-
-```{r class.source = "fold-hide"}
-(nb_rs_metrics <- collect_metrics(nb_rs))
-```
-
-
-```{r}
-nb_rs_predictions <- collect_predictions(nb_rs)
-```
-
-## Visualizations
-
-The visualizations reflect the results provided from `nb_rs_metrics` which showed:
-
-```{r, echo=FALSE}
-nb_rs_metrics%>%
-  select(.metric,mean)%>%
-    kableExtra::kable()
-```
-
-
-```{r class.source = "fold-hide"}
-nb_rs_predictions %>%
-  group_by(id) %>%
-  roc_curve(truth = class, .pred_ham) %>%
-  autoplot() +
-  labs(
-    color = NULL,
-    title = "ROC curve for ham - or - spam",
-    subtitle = "Each resample fold is shown in a different color"
-  )
-```
-
-
-```{r class.source = "fold-hide"}
-conf_mat_resampled(nb_rs, tidy = FALSE) %>%
-  autoplot(type = "heatmap")
-```
-
-## Conclusion
-
-The approach in using `tidymodels` and `textrecipe` came primarily from following the layout provided by [$Chapter\ 7: Classification\ |\ Supervised\ Machine\ Learning\ for\ Text\ Analysis\ in\ R$](https://smltar.com/mlclassification.html#classfirstattemptlookatdata). Although the evaluation and data manipulation was done correctly, I would attribute the lower accuracy from the the email details such as *source*, *sender*, etc. In order to expand on and test this theory, a future project with cleaner `text` data should be used, to see if the results differ.
 
 <!------- Below is for removing excessive space in Rmarkdown | HTML formatting -------->
 
