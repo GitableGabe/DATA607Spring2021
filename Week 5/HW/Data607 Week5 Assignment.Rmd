@@ -16,6 +16,7 @@ editor_options:
   chunk_output_type: console
 ---
 
+
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE, results = "hold")
 library(tidyverse)
